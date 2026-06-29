@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Licita Pro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.31.0/dist/tabler-icons.min.css"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --brand:#0B3D6B;
+  --brand2:#1A6DB5;
+  --brand-light:#EAF2FB;
+  --accent:#15A57A;
+  --accent-light:#E3F7F0;
+  --warn:#C47B0A;
+  --warn-light:#FEF3DC;
+  --danger:#B23232;
+  --danger-light:#FDEAEA;
+  --ink:#111827;
+  --ink2:#4B5563;
+  --ink3:#9CA3AF;
+  --surface:#FFFFFF;
+  --surface2:#F7F9FC;
+  --surface3:#EEF2F7;
+  --line:#E2E8F0;
+  --line2:#CBD5E1;
+  --radius:10px;
+  --radius-sm:6px;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06);
+  --shadow-sm:0 1px 2px rgba(0,0,0,.06);
+  --fd:'DM Sans',sans-serif;
+  --fs:'Syne',sans-serif;
+}
+body{font-family:var(--fd);color:var(--ink);background:var(--surface2);min-height:100vh;}
+
+/* ── LAYOUT ── */
+.app{display:flex;flex-direction:column;min-height:100vh;}
+.topbar{
+  position:sticky;top:0;z-index:100;
+  background:var(--brand);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;height:56px;
+  box-shadow:0 2px 8px rgba(11,61,107,.25);
+}
+.logo{font-family:var(--fs);font-size:20px;font-weight:800;color:#fff;letter-spacing:-0.5px;display:flex;align-items:center;gap:8px;}
+.logo span{color:#5DD6B0;}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.user-pill{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border-radius:20px;padding:4px 12px 4px 4px;cursor:pointer;}
+.avatar{width:28px;height:28px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;font-family:var(--fs);display:flex;align-items:center;justify-content:center;}
+.user-name{font-size:13px;color:rgba(255,255,255,.9);}
+
+.sidebar{
+  position:fixed;left:0;top:56px;bottom:0;width:220px;
+  background:var(--surface);border-right:1px solid var(--line);
+  padding:16px 0;display:flex;flex-direction:column;z-index:50;
+}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 20px;font-size:13.5px;font-weight:500;
+  color:var(--ink2);cursor:pointer;border-left:3px solid transparent;
+  transition:all .15s;
+}
+.nav-item:hover{background:var(--surface2);color:var(--ink);}
+.nav-item.active{color:var(--brand);background:var(--brand-light);border-left-color:var(--brand);}
+.nav-item i{font-size:18px;width:20px;text-align:center;}
+.nav-section{font-size:10px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:1px;padding:14px 20px 6px;}
+.nav-spacer{flex:1;}
+.nav-bottom{padding:12px 16px;border-top:1px solid var(--line);}
+.ticket-badge{background:var(--brand-light);border-radius:var(--radius-sm);padding:8px 10px;}
+.ticket-label{font-size:10px;color:var(--ink3);margin-bottom:2px;}
+.ticket-val{font-size:11px;color:var(--brand);font-family:monospace;word-break:break-all;}
+
+.main{margin-left:220px;padding:28px;min-height:calc(100vh - 56px);}
+
+/* ── SCREENS ── */
+.screen{display:none;}
+.screen.active{display:block;}
+
+/* ── PAGE HEADER ── */
+.page-header{margin-bottom:24px;}
+.page-title{font-family:var(--fs);font-size:22px;font-weight:800;color:var(--ink);margin-bottom:4px;}
+.page-sub{font-size:14px;color:var(--ink2);}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.stat{background:var(--surface);border-radius:var(--radius);padding:16px 18px;border:1px solid var(--line);box-shadow:var(--shadow-sm);}
+.stat-label{font-size:12px;color:var(--ink3);margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.stat-value{font-size:26px;font-weight:700;font-family:var(--fs);}
+.sv-blue{color:var(--brand);}
+.sv-green{color:var(--accent);}
+.sv-amber{color:var(--warn);}
+.sv-gray{color:var(--ink2);}
+
+/* ── FILTERS ── */
+.filters{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center;}
+.search-wrap{position:relative;flex:1;min-width:200px;}
+.search-wrap i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--ink3);font-size:16px;}
+.search-input{width:100%;padding:8px 12px 8px 34px;font-size:13.5px;border:1px solid var(--line2);border-radius:var(--radius-sm);background:var(--surface);color:var(--ink);font-family:var(--fd);}
+.search-input:focus{outline:none;border-color:var(--brand2);}
+select.filter{padding:8px 12px;font-size:13px;border:1px solid var(--line2);border-radius:var(--radius-sm);background:var(--surface);color:var(--ink);font-family:var(--fd);cursor:pointer;}
+select.filter:focus{outline:none;border-color:var(--brand2);}
+
+/* ── LICITACIONES LIST ── */
+.licit-list{display:flex;flex-direction:column;gap:10px;}
+.licit-card{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:18px 20px;cursor:pointer;
+  transition:border-color .15s,box-shadow .15s;box-shadow:var(--shadow-sm);
+}
+.licit-card:hover{border-color:var(--brand2);box-shadow:var(--shadow);}
+.lc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;}
+.lc-code{font-size:11px;color:var(--ink3);font-family:var(--fs);letter-spacing:.5px;margin-bottom:5px;}
+.lc-name{font-size:14.5px;font-weight:600;color:var(--ink);line-height:1.4;margin-bottom:6px;}
+.lc-org{font-size:12.5px;color:var(--ink2);display:flex;align-items:center;gap:5px;}
+.lc-footer{display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;}
+.b-green{background:#DCFCE7;color:#166534;}
+.b-blue{background:#DBEAFE;color:#1E40AF;}
+.b-amber{background:#FEF3C7;color:#92400E;}
+.b-gray{background:var(--surface3);color:var(--ink2);}
+.rubro-tag{font-size:11px;padding:2px 8px;border-radius:20px;background:var(--brand-light);color:var(--brand);font-weight:500;}
+.lc-cierre{font-size:11.5px;color:var(--ink3);margin-left:auto;display:flex;align-items:center;gap:4px;}
+.lc-monto{font-size:12px;font-weight:600;color:var(--ink2);}
+
+/* ── LOADING / EMPTY ── */
+.loading{display:flex;align-items:center;gap:10px;padding:32px 0;color:var(--ink2);font-size:14px;}
+.spinner{width:20px;height:20px;border:2px solid var(--line2);border-top-color:var(--brand2);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.empty{text-align:center;padding:48px;color:var(--ink3);}
+.empty i{font-size:40px;display:block;margin-bottom:10px;}
+
+/* ── DETALLE ── */
+.back-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--ink2);cursor:pointer;background:none;border:none;font-family:var(--fd);padding:0;margin-bottom:18px;}
+.back-btn:hover{color:var(--ink);}
+.det-hero{background:linear-gradient(135deg,var(--brand) 0%,var(--brand2) 100%);border-radius:var(--radius);padding:24px 26px;margin-bottom:20px;color:#fff;}
+.det-code{font-size:11px;color:rgba(255,255,255,.65);font-family:var(--fs);letter-spacing:.5px;margin-bottom:6px;}
+.det-title{font-family:var(--fs);font-size:18px;font-weight:800;margin-bottom:6px;}
+.det-org{font-size:13px;color:rgba(255,255,255,.8);}
+.det-badges{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;align-items:center;}
+.mp-link{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:rgba(255,255,255,.8);text-decoration:none;background:rgba(255,255,255,.15);border-radius:20px;padding:4px 12px;}
+.mp-link:hover{background:rgba(255,255,255,.25);}
+
+.det-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px;}
+.det-item{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px 14px;}
+.det-item label{font-size:11px;color:var(--ink3);display:block;margin-bottom:4px;}
+.det-item span{font-size:13.5px;font-weight:600;}
+
+.section-label{font-size:11px;font-weight:700;color:var(--ink3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;}
+
+.doc-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.doc-item{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-sm);padding:12px 14px;}
+.doc-icon{font-size:22px;color:var(--brand);flex-shrink:0;}
+.doc-info{flex:1;}
+.doc-name{font-size:13px;font-weight:500;}
+.doc-type{font-size:11px;color:var(--ink3);margin-top:1px;}
+.doc-btns{display:flex;gap:6px;}
+
+.actions-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;}
+
+/* ── UPLOAD ZONE ── */
+.dropzone{
+  border:1.5px dashed var(--line2);border-radius:var(--radius);
+  padding:32px;text-align:center;cursor:pointer;transition:all .2s;
+  background:var(--surface);margin-bottom:14px;
+}
+.dropzone:hover,.dropzone.over{border-color:var(--brand2);background:var(--brand-light);}
+.drop-icon{font-size:36px;color:var(--brand2);display:block;margin-bottom:8px;}
+.drop-title{font-family:var(--fs);font-size:15px;font-weight:700;margin-bottom:4px;}
+.drop-sub{font-size:13px;color:var(--ink3);}
+
+/* ── FILE QUEUE ── */
+.file-queue{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.fq-item{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-sm);padding:11px 14px;transition:border-color .2s;}
+.fq-item.proc{border-color:var(--brand2);background:var(--brand-light);}
+.fq-item.done{border-color:#86EFAC;background:#F0FDF4;}
+.fq-item.rev{border-color:#FCD34D;background:#FFFBEB;}
+.fq-info{flex:1;min-width:0;}
+.fq-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.fq-meta{font-size:11px;color:var(--ink3);margin-top:1px;}
+.fq-status{font-size:11px;font-weight:500;margin-top:3px;}
+.fq-prog{height:3px;background:var(--line);border-radius:2px;margin-top:5px;overflow:hidden;}
+.fq-prog-fill{height:100%;background:var(--brand2);border-radius:2px;transition:width .3s;}
+.fq-prog-fill.done{background:var(--accent);}
+.mini-spin{width:16px;height:16px;border:2px solid var(--line2);border-top-color:var(--brand2);border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0;}
+
+/* ── PERFIL ── */
+.perfil-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:var(--shadow-sm);}
+.card-title{font-family:var(--fs);font-size:15px;font-weight:700;color:var(--brand);margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.field{margin-bottom:14px;}
+.field label{font-size:12px;color:var(--ink3);display:block;margin-bottom:5px;}
+.field input,.field select{width:100%;padding:8px 10px;font-size:13.5px;border:1px solid var(--line2);border-radius:var(--radius-sm);background:var(--surface);color:var(--ink);font-family:var(--fd);}
+.field input:focus,.field select:focus{outline:none;border-color:var(--brand2);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.rubros-wrap{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;}
+.rubro-pill{font-size:11px;padding:4px 10px;border-radius:20px;background:var(--brand-light);color:var(--brand);font-weight:500;display:flex;align-items:center;gap:4px;cursor:pointer;}
+.firma-zone{border:1.5px dashed var(--line2);border-radius:var(--radius-sm);padding:20px;text-align:center;color:var(--ink3);font-size:13px;cursor:pointer;transition:background .15s;}
+.firma-zone:hover{background:var(--surface2);}
+.firma-preview{max-height:70px;max-width:200px;object-fit:contain;}
+.ticket-input{font-family:monospace;font-size:12px;}
+
+/* ── BTNS ── */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 18px;border-radius:var(--radius-sm);font-size:13.5px;font-weight:500;cursor:pointer;font-family:var(--fd);border:none;transition:opacity .15s;}
+.btn:hover{opacity:.88;}
+.btn-primary{background:var(--brand);color:#fff;}
+.btn-success{background:var(--accent);color:#fff;}
+.btn-outline{background:transparent;color:var(--ink);border:1px solid var(--line2);}
+.btn-outline:hover{background:var(--surface2);opacity:1;}
+.btn-sm{padding:5px 12px;font-size:12px;}
+.btn-warn{background:var(--warn);color:#fff;}
+
+/* ── PROGRESS BAR ── */
+.overall{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px 18px;margin-bottom:16px;display:none;}
+.ov-top{display:flex;justify-content:space-between;margin-bottom:8px;}
+.ov-title{font-size:13.5px;font-weight:600;}
+.ov-pct{font-size:13px;font-weight:600;color:var(--brand);}
+.ov-bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;}
+.ov-fill{height:100%;background:var(--brand);border-radius:3px;transition:width .4s;}
+.ov-status{font-size:12px;color:var(--ink3);margin-top:6px;}
+
+/* ── RESULT ── */
+.result{background:#F0FDF4;border:1px solid #86EFAC;border-radius:var(--radius);padding:18px;margin-bottom:16px;display:none;}
+.result-title{font-family:var(--fs);font-size:15px;font-weight:700;color:#166534;margin-bottom:4px;}
+.result-sub{font-size:13px;color:#166534;margin-bottom:14px;}
+.zip-box{background:#fff;border:1px solid #86EFAC;border-radius:var(--radius-sm);padding:12px 14px;font-family:monospace;font-size:12px;line-height:2;margin-bottom:14px;}
+.zip-root{color:var(--brand);font-weight:700;}
+.zip-ok{color:var(--accent);}
+.zip-rev{color:var(--warn);}
+
+/* ── LOGIN ── */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0B3D6B 0%,#1A6DB5 50%,#0D9E7A 100%);}
+.login-card{background:#fff;border-radius:16px;padding:40px;width:100%;max-width:380px;box-shadow:0 20px 60px rgba(0,0,0,.2);}
+.login-logo{font-family:var(--fs);font-size:26px;font-weight:800;color:var(--brand);margin-bottom:4px;}
+.login-logo span{color:var(--accent);}
+.login-sub{font-size:13px;color:var(--ink2);margin-bottom:28px;}
+.login-field{margin-bottom:16px;}
+.login-field label{font-size:12px;color:var(--ink2);display:block;margin-bottom:5px;}
+.login-field input{width:100%;padding:10px 12px;font-size:14px;border:1px solid var(--line2);border-radius:var(--radius-sm);background:var(--surface);color:var(--ink);font-family:var(--fd);}
+.login-field input:focus{outline:none;border-color:var(--brand2);}
+.login-btn{width:100%;padding:11px;background:var(--brand);color:#fff;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;font-family:var(--fd);transition:opacity .15s;}
+.login-btn:hover{opacity:.9;}
+.login-hint{font-size:12px;color:var(--ink3);text-align:center;margin-top:14px;}
+
+/* ── VISOR DOCS ── */
+.visor-container{margin-bottom:16px;}
+.visor-dropzone{
+  border:1.5px dashed var(--line2);border-radius:var(--radius);
+  padding:24px;text-align:center;cursor:pointer;
+  transition:border-color .2s,background .2s;background:var(--surface);
+  margin-bottom:10px;
+}
+.visor-dropzone:hover{border-color:var(--brand2);background:var(--brand-light);}
+.visor-lista{display:flex;flex-direction:column;gap:8px;}
+.visor-item{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius-sm);overflow:hidden;
+}
+.visor-item-header{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;cursor:pointer;transition:background .15s;
+}
+.visor-item-header:hover{background:var(--surface2);}
+.visor-item-icon{font-size:20px;color:var(--brand);flex-shrink:0;}
+.visor-item-info{flex:1;min-width:0;}
+.visor-item-name{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.visor-item-meta{font-size:11px;color:var(--ink3);margin-top:1px;}
+.visor-item-btns{display:flex;gap:6px;flex-shrink:0;}
+.visor-preview{
+  border-top:1px solid var(--line);background:var(--surface2);
+  padding:16px;display:none;
+}
+.visor-preview.open{display:block;}
+.visor-pdf-frame{width:100%;height:500px;border:none;border-radius:var(--radius-sm);}
+.visor-status{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;
+}
+.vs-pending{background:var(--surface3);color:var(--ink3);}
+.vs-done{background:#DCFCE7;color:#166534;}
+.vs-proc{background:var(--brand-light);color:var(--brand);}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--ink);color:#fff;padding:12px 20px;border-radius:var(--radius-sm);font-size:13px;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;z-index:999;}
+.toast.show{opacity:1;transform:translateY(0);}
+</style>
+</head>
+<body>
+
+<div id="toast" class="toast"></div>
+
+<!-- ══════════════════ LOGIN ══════════════════ -->
+<div id="view-login">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-logo">Licita<span>Pro</span></div>
+      <div class="login-sub">Gestión inteligente de licitaciones públicas</div>
+      <div class="login-field">
+        <label>Correo electrónico</label>
+        <input type="email" id="l-email" value="rodrigocohn@gmail.com"/>
+      </div>
+      <div class="login-field">
+        <label>Contraseña</label>
+        <input type="password" id="l-pass" value="••••••••"/>
+      </div>
+      <button class="login-btn" onclick="doLogin()">Ingresar</button>
+      <div class="login-hint">¿Sin cuenta? <a href="#" style="color:var(--brand2)" onclick="toast('Registro próximamente');return false">Regístrate aquí</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ APP ══════════════════ -->
+<div id="view-app" style="display:none;" class="app">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="logo"><i class="ti ti-building-bank"></i>Licita<span>Pro</span></div>
+    <div class="topbar-right">
+      <div class="user-pill" onclick="goScreen('perfil')">
+        <div class="avatar">RC</div>
+        <span class="user-name">Rodrigo Cohn</span>
+      </div>
+      <button class="btn btn-outline btn-sm" style="color:#fff;border-color:rgba(255,255,255,.3)" onclick="doLogout()">
+        <i class="ti ti-logout"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="nav-section">Principal</div>
+    <div class="nav-item active" id="nav-inicio" onclick="goScreen('inicio')">
+      <i class="ti ti-layout-dashboard"></i> Dashboard
+    </div>
+    <div class="nav-item" id="nav-licitaciones" onclick="goScreen('licitaciones')">
+      <i class="ti ti-list-search"></i> Licitaciones
+    </div>
+    <div class="nav-item" id="nav-agiles" onclick="goScreen('agiles')">
+      <i class="ti ti-shopping-cart"></i> Compras Ágiles
+    </div>
+    <div class="nav-section">Documentos</div>
+    <div class="nav-item" id="nav-procesar" onclick="goScreen('procesar')">
+      <i class="ti ti-bolt"></i> Procesar en lote
+    <div class="nav-item" id="nav-procesar" onclick="goScreen('procesar')">
+      <i class="ti ti-bolt"></i> Procesar en lote
+    </div>
+    <div class="nav-item" onclick="goScreen('procesar')">
+      <i class="ti ti-file-pencil"></i> Rellenar documentos
+    </div>
+    <div class="nav-item" id="nav-documentos" onclick="goScreen('documentos')">
+      <i class="ti ti-files"></i> Mis documentos
+    </div>
+    <div class="nav-spacer"></div>
+    <div class="nav-item" id="nav-perfil" onclick="goScreen('perfil')">
+      <i class="ti ti-user-circle"></i> Mi perfil
+    </div>
+    <div class="nav-bottom">
+      <div class="ticket-badge">
+        <div class="ticket-label">Ticket API activo</div>
+        <div class="ticket-val">BB555465-BB26...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- ── DASHBOARD ── -->
+    <div id="screen-inicio" class="screen active">
+      <div class="page-header">
+        <div class="page-title">Bienvenido, Rodrigo</div>
+        <div class="page-sub" id="dash-fecha">Cargando licitaciones...</div>
+      </div>
+
+      <!-- TABLERO DIVIDIDO: LICITACIONES | COMPRAS ÁGILES -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+
+        <!-- COLUMNA LICITACIONES -->
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid var(--brand);">
+            <i class="ti ti-list-search" style="color:var(--brand);font-size:20px;"></i>
+            <span style="font-family:var(--fs);font-size:15px;font-weight:700;color:var(--brand)">Licitaciones</span>
+            <button class="btn btn-outline btn-sm" style="margin-left:auto" onclick="goScreen('licitaciones')">Ver todas</button>
+          </div>
+
+          <!-- Stats licitaciones -->
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
+            <div class="stat" onclick="filtrarPorPlazo('hoy')" style="cursor:pointer;border-left:3px solid var(--danger);padding:10px 12px;">
+              <div class="stat-label" style="font-size:10px;"><i class="ti ti-alarm" style="color:var(--danger)"></i> Cierran HOY</div>
+              <div class="stat-value" style="color:var(--danger);font-size:20px;" id="d-hoy">—</div>
+              <div style="font-size:10px;color:var(--ink3);margin-top:2px;">↗ Ver</div>
+            </div>
+            <div class="stat" onclick="filtrarPorPlazo('3dias')" style="cursor:pointer;border-left:3px solid var(--warn);padding:10px 12px;">
+              <div class="stat-label" style="font-size:10px;"><i class="ti ti-clock-exclamation" style="color:var(--warn)"></i> En 3 días</div>
+              <div class="stat-value sv-amber" style="font-size:20px;" id="d-urgentes">—</div>
+              <div style="font-size:10px;color:var(--ink3);margin-top:2px;">↗ Ver</div>
+            </div>
+            <div class="stat" onclick="filtrarPorPlazo('semana')" style="cursor:pointer;border-left:3px solid var(--accent);padding:10px 12px;">
+              <div class="stat-label" style="font-size:10px;"><i class="ti ti-calendar" style="color:var(--accent)"></i> Esta semana</div>
+              <div class="stat-value sv-green" style="font-size:20px;" id="d-semana">—</div>
+              <div style="font-size:10px;color:var(--ink3);margin-top:2px;">↗ Ver</div>
+            </div>
+          </div>
+
+          <!-- Lista urgentes -->
+          <div style="background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;">
+            <div style="background:var(--warn-light);padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px;font-weight:600;color:var(--warn);">
+              <i class="ti ti-alarm"></i> Cierran pronto
+            </div>
+            <div id="dash-urgentes" style="padding:12px;">
+              <div class="loading"><div class="spinner"></div> Cargando...</div>
+            </div>
+          </div>
+
+          <!-- Rubros -->
+          <div style="background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;margin-top:12px;">
+            <div style="background:var(--accent-light);padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px;font-weight:600;color:var(--accent);">
+              <i class="ti ti-stars"></i> En tus rubros
+            </div>
+            <div id="dash-rubros" style="padding:12px;">
+              <div class="loading"><div class="spinner"></div> Cargando...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- COLUMNA COMPRAS ÁGILES -->
+        <div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid var(--accent);">
+            <i class="ti ti-shopping-cart" style="color:var(--accent);font-size:20px;"></i>
+            <span style="font-family:var(--fs);font-size:15px;font-weight:700;color:var(--accent)">Compras Ágiles</span>
+            <button class="btn btn-outline btn-sm" style="margin-left:auto" onclick="goScreen('agiles')">Ver todas</button>
+          </div>
+
+          <!-- Stats compras ágiles -->
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
+            <div class="stat" style="border-left:3px solid var(--danger);padding:10px 12px;">
+              <div class="stat-label" style="font-size:10px;"><i class="ti ti-clock" style="color:var(--danger)"></i> Hoy</div>
+              <div class="stat-value" style="color:var(--danger);font-size:20px;" id="dag-hoy">—</div>
+              <div style="font-size:10px;color:var(--ink3);margin-top:2px;">nuevas</div>
+            </div>
+            <div class="stat" style="border-left:3px solid var(--warn);padding:10px 12px;">
+              <div class="stat-label" style="font-size:10px;"><i class="ti ti-calendar" style="color:var(--warn)"></i> Esta semana</div>
+              <div class="stat-value sv-amber" style="font-size:20px;" id="dag-semana">—</div>
+              <div style="font-size:10px;color:var(--ink3);margin-top:2px;">órdenes</div>
+            </div>
+            <div class="stat" style="border-left:3px solid var(--accent);padding:10px 12px;">
+              <div class="stat-label" style="font-size:10px;"><i class="ti ti-stars" style="color:var(--accent)"></i> Mis rubros</div>
+              <div class="stat-value sv-green" style="font-size:20px;" id="dag-rubros">—</div>
+              <div style="font-size:10px;color:var(--ink3);margin-top:2px;">coinciden</div>
+            </div>
+          </div>
+
+          <!-- Lista compras ágiles recientes -->
+          <div style="background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;">
+            <div style="background:var(--accent-light);padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px;font-weight:600;color:var(--accent);">
+              <i class="ti ti-shopping-cart"></i> Recientes en tus rubros
+            </div>
+            <div id="dash-agiles" style="padding:12px;">
+              <div class="loading"><div class="spinner"></div> Cargando...</div>
+            </div>
+          </div>
+
+
+      </div>
+    </div>
+
+    <!-- ── LICITACIONES ── -->
+    <div id="screen-licitaciones" class="screen">
+      <div id="licit-lista">
+        <div class="page-header">
+          <div class="page-title">Licitaciones disponibles</div>
+          <div class="page-sub">Datos en tiempo real desde Mercado Público</div>
+        </div>
+        <div style="background:var(--brand-light);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+          <div>
+            <div style="font-size:13px;font-weight:600;color:var(--brand);margin-bottom:2px;"><i class="ti ti-stars"></i> Filtro por mis palabras clave</div>
+            <div style="font-size:12px;color:var(--ink2);">Mostrando licitaciones que coinciden con: <span id="kw-resumen" style="font-weight:500;color:var(--brand)">aseo, mantención, construcción, limpieza</span></div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
+              <input type="checkbox" id="toggle-kw" checked onchange="filtrar()" style="width:16px;height:16px;cursor:pointer;accent-color:var(--brand)"/>
+              Activar filtro
+            </label>
+            <button class="btn btn-outline btn-sm" onclick="goScreen('perfil');toast('Edita tus palabras clave en el perfil')"><i class="ti ti-edit"></i> Editar palabras</button>
+          </div>
+        </div>
+        <div class="filters">
+          <div class="search-wrap">
+            <i class="ti ti-search"></i>
+            <input class="search-input" id="s-q" placeholder="Buscar por nombre o código..." oninput="filtrar()"/>
+          </div>
+          <select class="filter" id="s-estado" onchange="filtrar()">
+            <option value="">Todos los estados</option>
+            <option value="Publicada">Publicadas</option>
+            <option value="Adjudicada">Adjudicadas</option>
+            <option value="Cerrada">Cerradas</option>
+          </select>
+          <button class="btn btn-outline btn-sm" onclick="cargarLicitaciones(true)"><i class="ti ti-refresh"></i> Actualizar</button>
+        </div>
+        <div id="licit-container"><div class="loading"><div class="spinner"></div> Consultando Mercado Público...</div></div>
+      </div>
+      <div id="licit-detalle" style="display:none;"></div>
+    </div>
+
+    <!-- ── DOCUMENTOS ── -->
+    <div id="screen-documentos" class="screen">
+      <div class="page-header">
+        <div class="page-title">Mis documentos</div>
+        <div class="page-sub">Historial de documentos procesados</div>
+      </div>
+      <div class="empty"><i class="ti ti-file-off"></i>Aún no has procesado documentos.<br><br><button class="btn btn-primary btn-sm" onclick="goScreen('procesar')"><i class="ti ti-bolt"></i> Procesar ahora</button></div>
+    </div>
+
+    <!-- ── PROCESAR EN LOTE ── -->
+    <div id="screen-procesar" class="screen">
+      <div class="page-header">
+        <div class="page-title">Procesar documentos en lote</div>
+        <div class="page-sub">Sube todos los archivos de una vez — se rellenan automáticamente con tus datos</div>
+      </div>
+      <div class="dropzone" id="dropzone" onclick="document.getElementById('file-in').click()"
+        ondragover="event.preventDefault();this.classList.add('over')"
+        ondragleave="this.classList.remove('over')"
+        ondrop="onDrop(event)">
+        <i class="ti ti-cloud-upload drop-icon"></i>
+        <div class="drop-title">Arrastra todos los archivos aquí</div>
+        <div class="drop-sub">o haz clic para seleccionar · PDF, DOC, DOCX · Múltiples archivos</div>
+      </div>
+      <input type="file" id="file-in" multiple accept=".pdf,.doc,.docx" style="display:none" onchange="onFiles(this.files)"/>
+      <div style="text-align:center;margin-bottom:20px;">
+        <button class="btn btn-outline btn-sm" onclick="demoFiles()"><i class="ti ti-test-pipe"></i> Cargar archivos de demo</button>
+      </div>
+      <div class="overall" id="overall">
+        <div class="ov-top"><span class="ov-title">Procesando documentos...</span><span class="ov-pct" id="ov-pct">0%</span></div>
+        <div class="ov-bar"><div class="ov-fill" id="ov-fill" style="width:0%"></div></div>
+        <div class="ov-status" id="ov-status">Iniciando...</div>
+      </div>
+      <div class="file-queue" id="fq"></div>
+      <div class="result" id="result">
+        <div class="result-title"><i class="ti ti-circle-check"></i> ¡Documentos listos!</div>
+        <div class="result-sub" id="result-sub"></div>
+        <div class="zip-box" id="zip-box"></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-success" onclick="toast('En la app real: descarga ZIP con todos los PDFs rellenados')"><i class="ti ti-file-zip"></i> Descargar ZIP</button>
+          <button class="btn btn-warn" id="btn-rev" style="display:none"><i class="ti ti-eye"></i> Revisar pendientes</button>
+          <button class="btn btn-outline" onclick="limpiar()"><i class="ti ti-refresh"></i> Procesar otros</button>
+        </div>
+      </div>
+      <div id="proc-actions" style="display:none;margin-top:4px;">
+        <button class="btn btn-primary" onclick="procesarTodo()"><i class="ti ti-bolt"></i> Procesar todos los documentos</button>
+        <button class="btn btn-outline" style="margin-left:8px" onclick="limpiar()"><i class="ti ti-trash"></i> Limpiar</button>
+      </div>
+    </div>
+
+    <!-- ── COMPRAS ÁGILES ── -->
+    <div id="screen-agiles" class="screen">
+      <div class="page-header">
+        <div class="page-title">Compras Ágiles</div>
+        <div class="page-sub">Órdenes de compra directas del Estado — hasta 30 UTM sin licitación</div>
+      </div>
+
+      <!-- INFO BOX -->
+      <div style="background:var(--accent-light);border:1px solid #9FE1CB;border-radius:var(--radius);padding:14px 18px;margin-bottom:20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <i class="ti ti-info-circle" style="font-size:28px;color:var(--accent);flex-shrink:0"></i>
+        <div>
+          <div style="font-size:13.5px;font-weight:600;color:var(--accent);margin-bottom:3px;">¿Qué es una Compra Ágil?</div>
+          <div style="font-size:13px;color:var(--ink2);">Son compras directas hasta 30 UTM (~$2.000.000) que los organismos públicos hacen sin licitación. Más rápidas, más frecuentes y sin formularios complejos.</div>
+        </div>
+      </div>
+
+      <!-- STATS COMPRAS ÁGILES -->
+      <div class="stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px;">
+        <div class="stat">
+          <div class="stat-label"><i class="ti ti-shopping-cart" style="color:var(--accent)"></i> Total cargadas</div>
+          <div class="stat-value sv-green" id="ag-total">—</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label"><i class="ti ti-clock" style="color:var(--brand)"></i> Últimos 7 días</div>
+          <div class="stat-value sv-blue" id="ag-semana">—</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label"><i class="ti ti-stars" style="color:var(--warn)"></i> En mis rubros</div>
+          <div class="stat-value sv-amber" id="ag-rubros">—</div>
+        </div>
+      </div>
+
+      <!-- FILTROS -->
+      <div class="filters" style="margin-bottom:16px;">
+        <div class="search-wrap" style="flex:1">
+          <i class="ti ti-search"></i>
+          <input class="search-input" id="ag-q" placeholder="Buscar por nombre o código..." oninput="filtrarAgiles()"/>
+        </div>
+        <select class="filter" id="ag-estado" onchange="filtrarAgiles()">
+          <option value="">Todos los estados</option>
+          <option value="Aceptada">Aceptadas</option>
+          <option value="Enviada">Enviadas</option>
+          <option value="Recepcion Conforme">Recepción conforme</option>
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="cargarAgiles(true)"><i class="ti ti-refresh"></i> Actualizar</button>
+      </div>
+
+      <!-- TOGGLE KEYWORDS -->
+      <div style="background:var(--brand-light);border:1px solid var(--line);border-radius:var(--radius);padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <div style="font-size:13px;color:var(--ink2);">
+          <span style="font-weight:600;color:var(--brand)"><i class="ti ti-filter"></i> Filtro por palabras clave:</span>
+          <span id="ag-kw-resumen" style="margin-left:6px;">aseo, mantención, construcción</span>
+        </div>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;">
+          <input type="checkbox" id="ag-toggle-kw" checked onchange="filtrarAgiles()" style="accent-color:var(--brand);width:16px;height:16px;"/>
+          Activar filtro
+        </label>
+      </div>
+
+      <!-- LISTA -->
+      <div id="agiles-container">
+        <div class="loading"><div class="spinner"></div> Cargando Compras Ágiles...</div>
+      </div>
+    </div>
+
+    <!-- ── PERFIL ── -->
+    <div id="screen-perfil" class="screen">
+      <div class="page-header">
+        <div class="page-title">Mi perfil</div>
+        <div class="page-sub">Datos que se usan para rellenar automáticamente tus documentos</div>
+      </div>
+      <div class="perfil-grid">
+        <div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-title"><i class="ti ti-user"></i> Datos personales</div>
+            <div class="row2">
+              <div class="field"><label>Nombre completo</label><input type="text" value="RODRIGO ANDRES COHN LINK"/></div>
+              <div class="field"><label>RUT</label><input type="text" value="15.314.096-0"/></div>
+            </div>
+            <div class="field"><label>Dirección comercial</label><input type="text" value="Avenida Santa Clara 301, Oficina 7807, Comuna Huechuraba, Santiago"/></div>
+            <div class="row2">
+              <div class="field"><label>Teléfono</label><input type="text" value="97757 1971"/></div>
+              <div class="field"><label>Correo</label><input type="text" value="rodrigocohn@gmail.com"/></div>
+            </div>
+            <div class="field">
+              <label>Tipo de participación</label>
+              <select>
+                <option selected>Persona natural</option>
+                <option>Persona jurídica</option>
+                <option>UTP</option>
+              </select>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title"><i class="ti ti-building-bank"></i> Datos bancarios</div>
+            <div class="row2">
+              <div class="field"><label>Banco</label><input type="text" value="Banco de Chile"/></div>
+              <div class="field"><label>Tipo de cuenta</label><select><option selected>Cuenta Corriente</option><option>Cuenta Vista</option><option>Ahorro</option></select></div>
+            </div>
+            <div class="row2">
+              <div class="field"><label>Número de cuenta</label><input type="text" value="00-123-00-631-07"/></div>
+              <div class="field"><label>RUT titular</label><input type="text" value="15.314.096-0"/></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-title"><i class="ti ti-tags"></i> Palabras clave de búsqueda</div>
+            <p style="font-size:12px;color:var(--ink3);margin-bottom:12px;">La app buscará licitaciones que contengan cualquiera de estas palabras. Agrégalas según tu rubro.</p>
+            <div class="rubros-wrap" id="rubros-wrap">
+              <span class="rubro-pill">aseo <i class="ti ti-x" onclick="quitarKeyword(this)"></i></span>
+              <span class="rubro-pill">mantención <i class="ti ti-x" onclick="quitarKeyword(this)"></i></span>
+              <span class="rubro-pill">construcción <i class="ti ti-x" onclick="quitarKeyword(this)"></i></span>
+              <span class="rubro-pill">limpieza <i class="ti ti-x" onclick="quitarKeyword(this)"></i></span>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:12px;">
+              <input type="text" id="nueva-keyword" placeholder="Ej: capacitación, ferretería, transporte..." 
+                style="flex:1;padding:7px 10px;font-size:13px;border:1px solid var(--line2);border-radius:var(--radius-sm);font-family:var(--fd);"
+                onkeydown="if(event.key==='Enter')agregarKeyword()"/>
+              <button class="btn btn-primary btn-sm" onclick="agregarKeyword()"><i class="ti ti-plus"></i> Agregar</button>
+            </div>
+            <div style="font-size:12px;color:var(--ink3);margin-top:8px;">Presiona Enter o el botón para agregar · Haz clic en la X para eliminar</div>
+          </div>
+          <div class="card" style="margin-bottom:16px;">
+            <div class="card-title"><i class="ti ti-signature"></i> Firma digital</div>
+            <div id="firma-zone-wrap">
+              <div class="firma-zone" onclick="document.getElementById('firma-in').click()">
+                <i class="ti ti-upload" style="font-size:28px;display:block;margin-bottom:8px;"></i>
+                Sube tu firma (PNG transparente recomendado)
+              </div>
+              <input type="file" id="firma-in" accept="image/*" style="display:none" onchange="cargarFirma(event)"/>
+            </div>
+            <div id="firma-prev" style="display:none;margin-top:10px;">
+              <div style="background:var(--accent-light);border-radius:var(--radius-sm);padding:12px;display:flex;align-items:center;gap:12px;">
+                <img id="firma-img" class="firma-preview"/>
+                <div>
+                  <div style="font-size:13px;font-weight:500;color:var(--accent)"><i class="ti ti-check"></i> Firma guardada</div>
+                  <button class="btn btn-outline btn-sm" style="margin-top:6px" onclick="quitarFirma()"><i class="ti ti-trash"></i> Cambiar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-title"><i class="ti ti-key"></i> API Mercado Público</div>
+            <div class="field"><label>Tu ticket de acceso</label><input type="text" class="ticket-input" value="BB555465-BB26-4427-A97D-3576980D3B85"/></div>
+            <div style="font-size:12px;color:var(--ink3);">Ticket activo · <a href="https://api.mercadopublico.cl" target="_blank" style="color:var(--brand2)">api.mercadopublico.cl</a></div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:20px;">
+        <button class="btn btn-primary" onclick="toast('Perfil guardado correctamente ✓')"><i class="ti ti-device-floppy"></i> Guardar cambios</button>
+      </div>
+    </div>
+
+
+    <!-- ── COMPRAS ÁGILES ── -->
+    <div id="screen-comprasagiles" class="screen">
+      <div class="page-header">
+        <div class="page-title">Compras Ágiles</div>
+        <div class="page-sub">Órdenes de compra directas del Estado — sin licitación, respuesta rápida</div>
+      </div>
+      <div style="background:var(--accent-light);border:1px solid #9FE1CB;border-radius:var(--radius);padding:14px 18px;margin-bottom:18px;display:flex;gap:14px;align-items:flex-start;">
+        <i class="ti ti-info-circle" style="font-size:20px;color:var(--accent);flex-shrink:0;margin-top:2px;"></i>
+        <div>
+          <div style="font-size:13px;font-weight:600;color:var(--accent);margin-bottom:3px;">¿Qué son las Compras Ágiles?</div>
+          <div style="font-size:12px;color:var(--ink2);">Son órdenes de compra directas que los organismos del Estado emiten sin licitación. Son más rápidas y frecuentes — ideal para proveedores que quieren más oportunidades de negocio.</div>
+        </div>
+      </div>
+      <div class="stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:18px;">
+        <div class="stat"><div class="stat-label"><i class="ti ti-shopping-cart"></i> Cargadas (7 días)</div><div class="stat-value sv-blue" id="oc-total">—</div></div>
+        <div class="stat"><div class="stat-label"><i class="ti ti-stars"></i> En mis rubros</div><div class="stat-value sv-green" id="oc-rubros">—</div></div>
+        <div class="stat"><div class="stat-label"><i class="ti ti-clock"></i> Hoy</div><div class="stat-value sv-amber" id="oc-hoy">—</div></div>
+      </div>
+      <div class="filters" style="margin-bottom:14px;">
+        <div class="search-wrap"><i class="ti ti-search"></i><input class="search-input" id="oc-q" placeholder="Buscar por nombre u organismo..." oninput="filtrarOC()"/></div>
+        <select class="filter" id="oc-estado" onchange="filtrarOC()">
+          <option value="">Todos los estados</option>
+          <option value="aceptada">Aceptada</option>
+          <option value="enviada">Enviada</option>
+          <option value="recepcionada">Recepcionada</option>
+        </select>
+        <button class="btn btn-outline btn-sm" onclick="cargarOC(true)"><i class="ti ti-refresh"></i> Actualizar</button>
+      </div>
+      <div style="background:var(--brand-light);border:1px solid var(--line);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <div style="font-size:13px;color:var(--ink2);"><i class="ti ti-stars" style="color:var(--brand)"></i> Filtrar por mis palabras clave: <span id="oc-kw-resumen" style="font-weight:500;color:var(--brand)">—</span></div>
+        <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;"><input type="checkbox" id="oc-toggle-kw" checked onchange="filtrarOC()" style="accent-color:var(--brand)"/> Activar</label>
+      </div>
+      <div id="oc-container"><div class="loading"><div class="spinner"></div> Cargando compras ágiles...</div></div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+const TICKET = 'BB555465-BB26-4427-A97D-3576980D3B85';
+const SUPABASE_FN_URL = '/.netlify/functions/mp-proxy'; // Función local de Netlify — sin CORS
+const SUPABASE_ANON_KEY = 'sb_publishable_uuZFXpD6aRJ4TueIZzA3OQ_TUatwzLx';
+let licitaciones = [], filtradas = [], archivos = [];
+let procesando = false;
+
+// ── AUTH ──
+function doLogin(){
+  document.getElementById('view-login').style.display='none';
+  document.getElementById('view-app').style.display='flex';
+  cargarLicitaciones();
+  cargarAgiles(false);
+}
+function doLogout(){
+  document.getElementById('view-login').style.display='block';
+  document.getElementById('view-app').style.display='none';
+}
+
+// ── NAVEGACIÓN ──
+function goScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  const nav=document.getElementById('nav-'+id);
+  if(nav) nav.classList.add('active');
+  if(id==='licitaciones'){
+    document.getElementById('licit-lista').style.display='block';
+    document.getElementById('licit-detalle').style.display='none';
+  }
+  // Cargar datos al entrar a la sección si están vacíos
+  if(id==='agiles' && ordenesAgiles.length===0) cargarAgiles(false);
+}
+
+// ── API MERCADO PÚBLICO ──
+const CACHE_KEY = 'licita_pro_licitaciones_cache';
+function setHtml(id, html){ const el=document.getElementById(id); if(el) el.innerHTML=html; }
+const CACHE_MINUTOS = 30;
+
+async function cargarLicitaciones(forzar){
+  // 1. Caché local — carga instantánea si datos son recientes
+  if(!forzar){
+    try{
+      const cached = JSON.parse(localStorage.getItem(CACHE_KEY));
+      if(cached && cached.data && cached.data.length && (Date.now()-cached.timestamp) < CACHE_MINUTOS*60*1000){
+        licitaciones = cached.data;
+        filtradas = [...licitaciones];
+        actualizarDash();
+        renderLista(filtradas);
+        renderDash();
+        const min = Math.round((Date.now()-cached.timestamp)/60000);
+        toast(`✓ ${licitaciones.length} licitaciones (hace ${min} min)`);
+        return;
+      }
+    }catch(e){}
+  }
+
+  // 2. Una sola llamada a Supabase — el servidor hace todo el trabajo
+  setHtml('licit-container','<div class="loading"><div class="spinner"></div> Cargando licitaciones de los últimos 30 días...</div>');
+  setHtml('dash-urgentes','<div class="loading"><div class="spinner"></div> Cargando...</div>');
+  setHtml('dash-rubros','<div class="loading"><div class="spinner"></div> Cargando...</div>');
+
+  // Intentar con timeout y retry automático
+  // Función Netlify en mismo dominio — sin problemas de CORS
+  const fetchConTimeout = (url, ms=25000) => {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), ms);
+    return fetch(url, { signal: ctrl.signal })
+      .finally(() => clearTimeout(timer));
+  };
+  let data = null;
+  let intentos = 0;
+  const MAX_INTENTOS = 3;
+
+  while(intentos < MAX_INTENTOS && !data){
+    try {
+      intentos++;
+      setHtml('licit-container',`<div class="loading"><div class="spinner"></div> Cargando licitaciones... (intento ${intentos}/${MAX_INTENTOS})</div>`);
+      const resp = await fetchConTimeout(`${SUPABASE_FN_URL}?dias=30`, 30000);
+      if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      const json = await resp.json();
+      if(json && json.Listado && json.Listado.length > 0){
+        data = json;
+      } else {
+        throw new Error('Sin datos');
+      }
+    } catch(e) {
+      console.warn(`Intento ${intentos} fallido:`, e.message);
+      if(intentos < MAX_INTENTOS){
+        await new Promise(r => setTimeout(r, 2000)); // esperar 2s antes de reintentar
+      }
+    }
+  }
+
+  if(data){
+    const estadoMap = {5:'Publicada',6:'Cerrada',7:'Desierta',8:'Adjudicada',15:'Suspendida',16:'Revocada'};
+    licitaciones = data.Listado.map(l => ({
+      ...l,
+      Estado: estadoMap[l.CodigoEstado] || l.Estado || 'Desconocido',
+      Nombre: l.Nombre || l.NombreLicitacion || ''
+    }));
+    toast(`✓ ${licitaciones.length} licitaciones cargadas`);
+    try{ localStorage.setItem(CACHE_KEY, JSON.stringify({timestamp:Date.now(),data:licitaciones})); }catch(e){}
+  } else {
+    licitaciones = [];
+    setHtml('licit-container',
+      '<div style="text-align:center;padding:40px;color:var(--ink3);">' +
+      '<i class="ti ti-wifi-off" style="font-size:40px;display:block;margin-bottom:12px;color:var(--warn);"></i>' +
+      '<div style="font-size:15px;font-weight:600;color:var(--ink2);margin-bottom:6px;">Sin conexión a Mercado Público</div>' +
+      '<div style="font-size:13px;margin-bottom:16px;">Verifica tu conexión e intenta de nuevo</div>' +
+      '<button class="btn btn-primary btn-sm" onclick="cargarLicitaciones(true)"><i class="ti ti-refresh"></i> Reintentar</button></div>'
+    );
+    filtradas = [];
+    actualizarDash();
+    renderDash();
+    return;
+  }
+
+  filtradas = [...licitaciones];
+  actualizarDash();
+  renderLista(filtradas);
+  renderDash();
+}
+
+function getFecha(diasAtras){
+  const d = new Date();
+  d.setDate(d.getDate() - diasAtras);
+  const dd = String(d.getDate()).padStart(2,'0');
+  const mm = String(d.getMonth()+1).padStart(2,'0');
+  const yyyy = d.getFullYear();
+  return `${dd}${mm}${yyyy}`;
+}
+
+function mock(){
+  // No hay datos de demo — solo se muestran licitaciones reales de la API
+  return [];
+}
+
+function esActiva(l){
+  // CodigoEstado 5 = Publicada (puede venir como int o string)
+  const cod = parseInt(l.CodigoEstado);
+  if(!isNaN(cod)) return cod === 5;
+  if(l.Estado) return l.Estado === 'Publicada';
+  return false;
+}
+function parseFecha(f){
+  if(!f) return null;
+  // Puede venir como "2026-06-20T17:00:00" o "\/Date(1234567890)\/" o "20/06/2026"
+  if(f.startsWith('/Date(')){
+    return new Date(parseInt(f.replace('/Date(','').replace(')/','')));
+  }
+  return new Date(f);
+}
+
+function actualizarDash(){
+  const activas = licitaciones.filter(l => esActiva(l));
+  const ahora = new Date(); ahora.setHours(0,0,0,0);
+
+  const cierranHoy = activas.filter(l => {
+    const f = parseFecha(l.FechaCierre); if(!f) return false;
+    const d = Math.ceil((f-ahora)/86400000); return d>=0 && d<=1;
+  });
+  const cierran3 = activas.filter(l => {
+    const f = parseFecha(l.FechaCierre); if(!f) return false;
+    const d = Math.ceil((f-ahora)/86400000); return d>=0 && d<=3;
+  });
+  const cierranSemana = activas.filter(l => {
+    const f = parseFecha(l.FechaCierre); if(!f) return false;
+    const d = Math.ceil((f-ahora)/86400000); return d>=0 && d<=7;
+  });
+
+  const keywords = getKeywords();
+  const sinT = s => (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+  const enRubros = activas.filter(l => {
+    if(!keywords.length) return true;
+    const nom = sinT(l.Nombre||''); const desc = sinT(l.Descripcion||'');
+    return keywords.some(kw => nom.includes(sinT(kw)) || desc.includes(sinT(kw)));
+  });
+
+  // Guardar para filtrarPorPlazo
+  window._cierranHoy = cierranHoy;
+  window._cierran3   = cierran3;
+  window._cierranSem = cierranSemana;
+
+  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  set('d-hoy', cierranHoy.length);
+  set('d-urgentes', cierran3.length);
+  set('d-semana', cierranSemana.length);
+
+  const fecha = new Date().toLocaleDateString('es-CL',{weekday:'long',day:'numeric',month:'long'});
+  const dF = document.getElementById('dash-fecha');
+  if(dF) dF.textContent = `Hoy es ${fecha} · ${activas.length} activas de ${licitaciones.length} cargadas`;
+
+  renderDashUrgentes(cierran3);
+  renderDashRubros(enRubros);
+}
+
+function renderDashUrgentes(lista){
+  const box = document.getElementById('dash-urgentes');
+  if(!lista.length){
+    box.innerHTML = '<div style="padding:8px 0;font-size:13px;color:var(--ink3);text-align:center;"><i class="ti ti-circle-check" style="font-size:24px;display:block;margin-bottom:6px;color:var(--accent)"></i>Sin licitaciones urgentes por ahora</div>';
+    return;
+  }
+  box.innerHTML = lista.slice(0,5).map(l => {
+    const fechaObj = parseFecha(l.FechaCierre);
+    const dias = fechaObj ? Math.ceil((fechaObj - new Date()) / 86400000) : 0;
+    const color = dias <= 1 ? 'var(--danger)' : 'var(--warn)';
+    const label = dias === 0 ? '¡Cierra HOY!' : dias === 1 ? 'Cierra MAÑANA' : `Cierra en ${dias} días`;
+    return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);cursor:pointer" onclick="abrirDetalleDesdeDash('${l.CodigoExterno}')">
+      <div style="flex-shrink:0;width:56px;height:56px;border-radius:var(--radius-sm);background:${color}15;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid ${color}40;">
+        <div style="font-size:18px;font-weight:800;font-family:var(--fs);color:${color}">${dias}</div>
+        <div style="font-size:9px;color:${color};font-weight:600">DÍAS</div>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:2px">${l.CodigoExterno} · ${l.NombreOrganismo||''}</div>
+        <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${l.Nombre}</div>
+        <div style="font-size:11px;font-weight:600;color:${color};margin-top:2px">${label}</div>
+      </div>
+      <div style="flex-shrink:0;display:flex;flex-direction:column;gap:4px;align-items:flex-end">
+        ${l.Monto?`<div style="font-size:12px;font-weight:600;color:var(--ink2)">${fmonto(l.Monto)}</div>`:''}
+        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();goScreen('procesar')"><i class="ti ti-bolt"></i> Procesar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderDashRubros(lista){
+  const box = document.getElementById('dash-rubros');
+  if(!lista.length){
+    box.innerHTML = `<div style="padding:8px 0;font-size:13px;color:var(--ink3);text-align:center;"><i class="ti ti-tag-off" style="font-size:24px;display:block;margin-bottom:6px"></i>Sin coincidencias con tus palabras clave · <a href="#" onclick="goScreen('perfil')" style="color:var(--brand2)">Agregar palabras clave</a></div>`;
+    return;
+  }
+  box.innerHTML = lista.slice(0,5).map(l => {
+    const fechaObjR = parseFecha(l.FechaCierre);
+    const dias = fechaObjR && !isNaN(fechaObjR) ? Math.ceil((fechaObjR - new Date()) / 86400000) : null;
+    return `<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);cursor:pointer" onclick="abrirDetalleDesdeDash('${l.CodigoExterno}')">
+      <i class="ti ti-file-search" style="font-size:22px;color:var(--accent);flex-shrink:0"></i>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;color:var(--ink3);margin-bottom:2px">${l.CodigoExterno} · ${l.NombreOrganismo||''}</div>
+        <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${l.Nombre}</div>
+        <div style="display:flex;gap:8px;margin-top:3px;align-items:center">
+          <span class="badge b-green">Publicada</span>
+          ${dias!==null?`<span style="font-size:11px;color:var(--ink3)">${formatFecha(l.FechaCierre)}</span>`:''}
+        </div>
+      </div>
+      ${l.Monto?`<div style="font-size:12px;font-weight:600;color:var(--ink2);flex-shrink:0">${fmonto(l.Monto)}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderDash(){ actualizarDash(); actualizarDashAgiles(); }
+
+function actualizarDashAgiles(){
+  if(!ordenesAgiles.length) return;
+  const ahora = new Date(); ahora.setHours(0,0,0,0);
+
+  const hoy = ordenesAgiles.filter(o => {
+    const f = parseFecha(o.FechaEnvioOrden||o.Fecha); if(!f) return false;
+    return (ahora-f) <= 86400000 && (ahora-f) >= 0;
+  });
+  const tres = ordenesAgiles.filter(o => {
+    const f = parseFecha(o.FechaEnvioOrden||o.Fecha); if(!f) return false;
+    return (ahora-f) <= 3*86400000 && (ahora-f) >= 0;
+  });
+  const sem = ordenesAgiles.filter(o => {
+    const f = parseFecha(o.FechaEnvioOrden||o.Fecha); if(!f) return false;
+    return (ahora-f) <= 7*86400000 && (ahora-f) >= 0;
+  });
+
+  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  set('dag-hoy',   hoy.length);
+  set('dag-3dias', tres.length);
+  set('dag-semana',sem.length);
+
+  // Top en rubros
+  const keywords = getKeywords();
+  const sinT = s => (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+  const enRubros = ordenesAgiles.filter(o => {
+    if(!keywords.length) return true;
+    const nom = sinT(o.Nombre||o.NombreItem||'');
+    return keywords.some(kw => nom.includes(sinT(kw)));
+  });
+
+  const box = document.getElementById('dash-agiles-rubros');
+  if(!box) return;
+  if(!enRubros.length){
+    box.innerHTML='<div style="padding:10px;font-size:12px;color:var(--ink3);text-align:center">Sin coincidencias con tus palabras clave</div>';
+    return;
+  }
+  box.innerHTML = enRubros.slice(0,4).map(o => {
+    const monto = o.TotalNeto||o.Monto ? '$'+Math.round(o.TotalNeto||o.Monto).toLocaleString('es-CL') : '—';
+    return `<div style="padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer" onclick="goScreen('agiles')">
+      <div style="font-size:11px;color:var(--ink3);margin-bottom:2px">${o.CodigoExterno||o.Numero||'—'} · ${o.NombreOrganismo||o.Comprador||'—'}</div>
+      <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${o.Nombre||o.NombreItem||'Sin nombre'}</div>
+      <div style="display:flex;gap:8px;margin-top:3px;align-items:center">
+        <span class="badge b-green" style="font-size:10px">Compra Ágil</span>
+        <span style="font-size:12px;font-weight:600;color:var(--accent);margin-left:auto">${monto}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function getKeywords(){
+  const pills = document.querySelectorAll('#rubros-wrap .rubro-pill');
+  return Array.from(pills).map(p => p.textContent.trim().replace('×','').trim().toLowerCase());
+}
+
+function filtrar(){
+  const q = document.getElementById('s-q').value.toLowerCase();
+  const est = document.getElementById('s-estado').value;
+  const kwToggle = document.getElementById('toggle-kw');
+  const usarKW = kwToggle && kwToggle.checked;
+  const keywords = usarKW ? getKeywords() : [];
+
+  // Actualizar resumen de keywords en el banner
+  const resEl = document.getElementById('kw-resumen');
+  if(resEl) resEl.textContent = keywords.length ? keywords.join(', ') : 'ninguna — agrega palabras en tu perfil';
+
+  filtradas = licitaciones.filter(l => {
+    const nombre = (l.Nombre || '').toLowerCase();
+    const codigo = (l.CodigoExterno || '').toLowerCase();
+    const desc = (l.Descripcion || '').toLowerCase();
+
+    // Filtro por búsqueda manual
+    const mq = !q || nombre.includes(q) || codigo.includes(q) || desc.includes(q);
+
+    // Filtro por estado
+    const me = !est || l.Estado === est;
+
+    // Filtro por palabras clave del perfil (sin tildes para mejor coincidencia)
+    const sinT = s => s.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+    const mkw = !usarKW || keywords.length === 0 || keywords.some(kw => sinT(nombre).includes(sinT(kw)) || sinT(desc).includes(sinT(kw)));
+
+    return mq && me && mkw;
+  });
+
+  // Mostrar contador
+  const total = licitaciones.length;
+  const mostrando = filtradas.length;
+  const info = usarKW && keywords.length > 0
+    ? `${mostrando} de ${total} licitaciones coinciden con tus palabras clave`
+    : `${mostrando} licitaciones`;
+  document.getElementById('licit-container').setAttribute('data-info', info);
+
+  renderLista(filtradas);
+}
+
+function filtrarPorPlazo(plazo){
+  goScreen('licitaciones');
+  setHtml('licit-detalle','');
+  document.getElementById('licit-lista').style.display='block';
+  document.getElementById('licit-detalle').style.display='none';
+
+  const map = {
+    hoy:    { lista: window._cierranHoy||[], label:'Cierran HOY',         color:'var(--danger)' },
+    '3dias':{ lista: window._cierran3||[],   label:'Cierran en 3 días',   color:'var(--warn)'   },
+    semana: { lista: window._cierranSem||[], label:'Cierran esta semana', color:'var(--accent)'  },
+  };
+  const { lista, label, color } = map[plazo] || { lista:[], label:'', color:'' };
+  filtradas = lista;
+
+  const banner = `<div style="background:${color}15;border:1px solid ${color}40;border-radius:var(--radius-sm);padding:10px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <div style="font-size:13px;font-weight:600;color:${color}"><i class="ti ti-filter"></i> ${label} · ${lista.length} licitaciones</div>
+    <button class="btn btn-outline btn-sm" onclick="filtradas=[...licitaciones];renderLista(filtradas)"><i class="ti ti-x"></i> Ver todas</button>
+  </div>`;
+  renderLista(filtradas, banner);
+}
+
+function renderLista(lista, banner=''){
+  const c=document.getElementById('licit-container');
+  if(!c) return;
+  if(!lista.length){c.innerHTML=(banner||'')+'<div class="empty"><i class="ti ti-search-off"></i>Sin resultados para tu búsqueda.</div>';return;}
+  c.innerHTML=(banner||'')+`<div class="licit-list">${lista.map((l,i)=>`
+    <div class="licit-card" onclick="verDetalle(${i})">
+      <div class="lc-top">
+        <div>
+          <div class="lc-code">${l.CodigoExterno||'—'}</div>
+          <div class="lc-name">${l.Nombre||'Sin nombre'}</div>
+          <div class="lc-org"><i class="ti ti-building"></i>${l.NombreOrganismo||'—'}</div>
+        </div>
+      </div>
+      <div class="lc-footer">
+        <span class="badge ${ebadge(l.Estado)}">${l.Estado||'—'}</span>
+        ${l.Rubro?`<span class="rubro-tag">${l.Rubro}</span>`:''}
+        ${l.FechaCierre?`<span class="lc-cierre"><i class="ti ti-clock"></i>${formatFecha(l.FechaCierre)}</span>`:''}
+        ${l.Monto?`<span class="lc-monto">${fmonto(l.Monto)}</span>`:''}
+      </div>
+    </div>`).join('')}</div>`;
+}
+
+function ebadge(e,c){if(c===5||e==='Publicada')return 'b-green';if(c===8||e==='Adjudicada')return 'b-blue';if(c===7||e==='Desierta')return 'b-amber';return 'b-gray';}
+function fmonto(m){return m?'$'+Math.round(m).toLocaleString('es-CL'):'';}
+function formatFecha(f){
+  if(!f)return'';
+  const fecha = parseFecha(f);
+  if(!fecha || isNaN(fecha)) return '';
+  const d=Math.ceil((fecha-new Date())/86400000);
+  if(d<0)return'Cerrada';if(d===0)return'Cierra hoy';if(d===1)return'Cierra mañana';
+  return`Cierra en ${d} días`;
+}
+
+function verDetalle(i){
+  const l=filtradas[i];
+  // URL correcta de Mercado Público — usa el código externo directamente
+  const codigoMP = encodeURIComponent(l.CodigoExterno || '');
+  const mpUrl = `https://www.mercadopublico.cl/Procurement/Modules/RFB/DetailsAcquisition.aspx?idLicitacion=${l.CodigoExterno||''}`;
+  document.getElementById('licit-lista').style.display='none';
+  const d=document.getElementById('licit-detalle');
+  d.style.display='block';
+  d.innerHTML=`
+    <button class="back-btn" onclick="document.getElementById('licit-lista').style.display='block';document.getElementById('licit-detalle').style.display='none'">
+      <i class="ti ti-arrow-left"></i> Volver
+    </button>
+    <div class="det-hero">
+      <div class="det-code">${l.CodigoExterno||'—'}</div>
+      <div class="det-title">${l.Nombre||'Sin nombre'}</div>
+      <div class="det-org">${l.NombreOrganismo||'—'}</div>
+      <div class="det-badges">
+        <span class="badge ${ebadge(l.Estado)}">${l.Estado}</span>
+        <a href="${mpUrl}" target="_blank" class="mp-link" onclick="return verificarLink(event, this.href)"><i class="ti ti-external-link"></i> Ver en Mercado Público</a>
+        <a href="https://www.mercadopublico.cl/Procurement/Modules/RFB/ListProcess.aspx?&dec=0&TextSearch=${encodeURIComponent(l.CodigoExterno||'')}" target="_blank" class="mp-link"><i class="ti ti-search"></i> Buscar en MP</a>
+      </div>
+    </div>
+    <div class="det-grid">
+      <div class="det-item"><label>Fecha de cierre</label><span>${l.FechaCierre?new Date(l.FechaCierre).toLocaleDateString('es-CL'):'—'}</span></div>
+      <div class="det-item"><label>Tiempo restante</label><span>${formatFecha(l.FechaCierre)||'—'}</span></div>
+      <div class="det-item"><label>Monto estimado</label><span>${fmonto(l.Monto)||'—'}</span></div>
+      <div class="det-item"><label>Rubro</label><span>${l.Rubro||'—'}</span></div>
+    </div>
+    <div class="section-label">Documentos de la licitación</div>
+
+    <!-- Zona de carga de documentos -->
+    <div style="background:var(--brand-light);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:600;color:var(--brand);margin-bottom:2px;"><i class="ti ti-info-circle"></i> ¿Cómo obtener los documentos?</div>
+        <div style="font-size:12px;color:var(--ink2);">1. Abre la licitación en MP · 2. Descarga los archivos · 3. Súbelos aquí para verlos y rellenarlos</div>
+      </div>
+      <a href="${mpUrl}" target="_blank" class="btn btn-outline btn-sm"><i class="ti ti-external-link"></i> Ir a MP</a>
+    </div>
+
+    <!-- Visor de documentos subidos -->
+    <div id="visor-docs-${l.CodigoExterno ? l.CodigoExterno.replace(/[^a-zA-Z0-9]/g,'') : 'lic'}" class="visor-container">
+      <div class="visor-dropzone" onclick="document.getElementById('visor-input-${l.CodigoExterno ? l.CodigoExterno.replace(/[^a-zA-Z0-9]/g,'') : 'lic'}').click()"
+        ondragover="event.preventDefault();this.style.borderColor='var(--brand2)'"
+        ondragleave="this.style.borderColor=''"
+        ondrop="visorDrop(event,'${l.CodigoExterno ? l.CodigoExterno.replace(/[^a-zA-Z0-9]/g,'') : 'lic'}')">
+        <i class="ti ti-upload" style="font-size:28px;color:var(--brand2);display:block;margin-bottom:6px;"></i>
+        <div style="font-size:13.5px;font-weight:600;margin-bottom:3px;">Sube los documentos de esta licitación</div>
+        <div style="font-size:12px;color:var(--ink3);">PDF, DOC, DOCX · Múltiples archivos · Arrastra o haz clic</div>
+      </div>
+      <input type="file" id="visor-input-${l.CodigoExterno ? l.CodigoExterno.replace(/[^a-zA-Z0-9]/g,'') : 'lic'}" multiple accept=".pdf,.doc,.docx" style="display:none"
+        onchange="visorAgregarArchivos(this.files,'${l.CodigoExterno ? l.CodigoExterno.replace(/[^a-zA-Z0-9]/g,'') : 'lic'}')"/>
+      <div id="visor-lista-${l.CodigoExterno ? l.CodigoExterno.replace(/[^a-zA-Z0-9]/g,'') : 'lic'}" class="visor-lista"></div>
+    </div>
+
+    <div class="actions-row" style="margin-top:16px;">
+      <button class="btn btn-primary" onclick="visorProcesarTodo('${l.CodigoExterno ? l.CodigoExterno.replace(/[^a-zA-Z0-9]/g,'') : 'lic'}')"><i class="ti ti-bolt"></i> Rellenar todos con mis datos</button>
+      <button class="btn btn-success" onclick="window.open('https://www.mercadopublico.cl/Procurement/Modules/RFB/ListProcess.aspx?TextSearch='+encodeURIComponent(l.CodigoExterno||''),'_blank')"><i class="ti ti-send"></i> Participar en MP</button>
+    </div>`;
+}
+
+// ── PROCESAR EN LOTE ──
+const DEMOS=[
+  {name:'Bases_administrativas.pdf',size:'1.2 MB',tipo:'campos',campos:14,desc:'Bases administrativas'},
+  {name:'Formulario_oferta_economica.pdf',size:'890 KB',tipo:'campos',campos:8,desc:'Oferta económica'},
+  {name:'Formulario_oferta_tecnica.pdf',size:'1.1 MB',tipo:'campos',campos:11,desc:'Oferta técnica'},
+  {name:'Declaracion_jurada_simple.pdf',size:'340 KB',tipo:'ia',campos:6,desc:'Declaración jurada'},
+  {name:'Anexo_1_identificacion.pdf',size:'210 KB',tipo:'campos',campos:9,desc:'Identificación proveedor'},
+  {name:'Anexo_2_experiencia.pdf',size:'450 KB',tipo:'ia',campos:4,desc:'Experiencia empresa'},
+  {name:'Declaracion_inhabilitaciones.pdf',size:'280 KB',tipo:'campos',campos:5,desc:'Declaración inhabilidades'},
+  {name:'Garantia_seriedad_oferta.pdf',size:'190 KB',tipo:'revision',campos:3,desc:'Requiere datos bancarios'},
+  {name:'Contrato_tipo.pdf',size:'2.4 MB',tipo:'ia',campos:7,desc:'Contrato tipo'},
+  {name:'Especificaciones_tecnicas.pdf',size:'3.1 MB',tipo:'revision',campos:2,desc:'Requiere especificaciones'},
+];
+
+function demoFiles(){
+  archivos=DEMOS.map((d,i)=>({...d,id:i,estado:'espera',prog:0}));
+  renderFQ();
+  document.getElementById('proc-actions').style.display='block';
+  document.getElementById('result').style.display='none';
+  document.getElementById('overall').style.display='none';
+}
+function onDrop(e){e.preventDefault();document.getElementById('dropzone').classList.remove('over');onFiles(e.dataTransfer.files);}
+function onFiles(files){
+  const nuevos=Array.from(files).map((f,i)=>({
+    id:archivos.length+i,name:f.name,
+    size:f.size<1048576?(f.size/1024).toFixed(0)+' KB':(f.size/1048576).toFixed(1)+' MB',
+    tipo:Math.random()>.6?'campos':(Math.random()>.5?'ia':'revision'),
+    campos:Math.floor(Math.random()*10)+3,desc:'Documento de licitación',estado:'espera',prog:0
+  }));
+  archivos=[...archivos,...nuevos];
+  renderFQ();
+  document.getElementById('proc-actions').style.display='block';
+}
+
+function renderFQ(){
+  const c=document.getElementById('fq');
+  if(!archivos.length){c.innerHTML='';return;}
+  c.innerHTML=archivos.map(a=>fqItem(a)).join('');
+}
+
+function fqItem(a){
+  const cls={espera:'',procesando:'proc',done:'done',review:'rev',error:''}[a.estado]||'';
+  const icons={espera:'ti-file-type-pdf',done:'ti-circle-check',review:'ti-alert-circle',error:'ti-circle-x'};
+  const colors={espera:'color:var(--brand)',done:'color:var(--accent)',review:'color:var(--warn)',error:'color:var(--danger)'};
+  const statText={espera:'En espera',procesando:'Procesando...',done:`✓ ${a.campos} campos rellenados · Firma estampada`,review:'⚠ Requiere revisión manual',error:'✕ Error al procesar'};
+  const statColor={espera:'color:var(--ink3)',procesando:'color:var(--brand)',done:'color:var(--accent)',review:'color:var(--warn)',error:'color:var(--danger)'};
+  const badgeMap={campos:'<span style="font-size:10px;padding:2px 8px;border-radius:20px;background:var(--brand-light);color:var(--brand);font-weight:600">Campos PDF</span>',ia:'<span style="font-size:10px;padding:2px 8px;border-radius:20px;background:var(--warn-light);color:var(--warn);font-weight:600">Relleno IA</span>',revision:'<span style="font-size:10px;padding:2px 8px;border-radius:20px;background:var(--accent-light);color:var(--accent);font-weight:600">Revisión</span>'};
+  const spin=a.estado==='procesando'?'<div class="mini-spin"></div>':`<i class="ti ${icons[a.estado]||icons.espera}" style="${colors[a.estado]||colors.espera};font-size:22px;flex-shrink:0"></i>`;
+  const prog=a.estado==='procesando'?`<div class="fq-prog"><div class="fq-prog-fill" id="fp-${a.id}" style="width:${a.prog}%"></div></div>`:a.estado==='done'?'<div class="fq-prog"><div class="fq-prog-fill done" style="width:100%"></div></div>':'';
+  return`<div class="fq-item ${cls}" id="fi-${a.id}">${spin}<div class="fq-info"><div class="fq-name">${a.name}</div><div class="fq-meta">${a.size} · ${a.desc}</div><div class="fq-status" style="${statColor[a.estado]||statColor.espera}">${statText[a.estado]||''}</div>${prog}</div>${badgeMap[a.tipo]||''}${a.estado==='espera'?`<button class="btn btn-outline btn-sm" onclick="eliminar(${a.id})"><i class="ti ti-trash"></i></button>`:''}</div>`;
+}
+
+function eliminar(id){archivos=archivos.filter(a=>a.id!==id);renderFQ();if(!archivos.length)document.getElementById('proc-actions').style.display='none';}
+function limpiar(){archivos=[];renderFQ();document.getElementById('proc-actions').style.display='none';document.getElementById('overall').style.display='none';document.getElementById('result').style.display='none';}
+
+async function procesarTodo(){
+  if(procesando)return;
+  procesando=true;
+  document.getElementById('overall').style.display='block';
+  document.getElementById('result').style.display='none';
+  const total=archivos.length;let done=0;
+  for(let i=0;i<archivos.length;i++){
+    archivos[i].estado='procesando';archivos[i].prog=0;
+    updateFQItem(i);
+    document.getElementById('ov-status').textContent=`Procesando: ${archivos[i].name}`;
+    await animProg(i,archivos[i].tipo==='ia'?1600:1100);
+    archivos[i].estado=archivos[i].tipo==='revision'?'review':'done';
+    done++;
+    const pct=Math.round(done/total*100);
+    document.getElementById('ov-pct').textContent=pct+'%';
+    document.getElementById('ov-fill').style.width=pct+'%';
+    updateFQItem(i);
+  }
+  document.getElementById('ov-status').textContent='¡Todos los documentos procesados!';
+  mostrarResultado();
+  procesando=false;
+}
+
+function updateFQItem(i){
+  const el=document.getElementById('fi-'+archivos[i].id);
+  if(el)el.outerHTML=fqItem(archivos[i]);
+}
+
+function animProg(i,dur){
+  return new Promise(r=>{
+    let p=0;const steps=20,iv=dur/steps;
+    const t=setInterval(()=>{
+      p+=100/steps+(Math.random()*4-2);p=Math.min(p,95);
+      archivos[i].prog=p;
+      const el=document.getElementById('fp-'+archivos[i].id);
+      if(el)el.style.width=p+'%';
+      if(p>=95){clearInterval(t);r();}
+    },iv);
+  });
+}
+
+function mostrarResultado(){
+  const done=archivos.filter(a=>a.estado==='done');
+  const rev=archivos.filter(a=>a.estado==='review');
+  document.getElementById('result').style.display='block';
+  document.getElementById('result-sub').textContent=`${done.length} documentos listos · ${rev.length} requieren revisión rápida`;
+  let zip=`<span style="color:var(--brand);font-weight:700">📦 Licitacion_documentos.zip</span>\n`;
+  done.forEach(a=>{zip+=`<span style="color:var(--accent)">  ✓ ${a.name.replace('.pdf','_rellenado.pdf')}</span>\n`;});
+  rev.forEach(a=>{zip+=`<span style="color:var(--warn)">  ⚠ ${a.name.replace('.pdf','_revision.pdf')}</span>\n`;});
+  setHtml('zip-box', zip);
+  if(rev.length){
+    const btnRev=document.getElementById('btn-rev');
+    if(btnRev){btnRev.style.display='inline-flex';btnRev.innerHTML=`<i class="ti ti-eye"></i> Revisar ${rev.length} pendiente${rev.length>1?'s':''}`;}
+  }
+}
+
+// ── PERFIL ──
+function cargarFirma(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=ev=>{
+    document.getElementById('firma-img').src=ev.target.result;
+    document.getElementById('firma-zone-wrap').style.display='none';
+    document.getElementById('firma-prev').style.display='block';
+    toast('Firma cargada correctamente');
+  };
+  r.readAsDataURL(f);
+}
+function quitarFirma(){
+  document.getElementById('firma-zone-wrap').style.display='block';
+  document.getElementById('firma-prev').style.display='none';
+  document.getElementById('firma-in').value='';
+}
+function quitarRubro(el){el.closest('.rubro-pill').remove();}
+function quitarKeyword(el){
+  el.closest('.rubro-pill').remove();
+  filtrar();
+  actualizarResumenKW();
+}
+function agregarKeyword(){
+  const inp = document.getElementById('nueva-keyword');
+  const val = inp.value.trim().toLowerCase();
+  if(!val) return;
+  // Evitar duplicados
+  const existing = getKeywords();
+  if(existing.includes(val)){ toast('Esa palabra ya está en tu lista'); inp.value=''; return; }
+  const pill = document.createElement('span');
+  pill.className = 'rubro-pill';
+  pill.innerHTML = `${val} <i class="ti ti-x" onclick="quitarKeyword(this)"></i>`;
+  const wrap = document.getElementById('rubros-wrap');
+  wrap.insertBefore(pill, wrap.querySelector('input') || null);
+  inp.value = '';
+  actualizarResumenKW();
+  filtrar();
+  toast(`"${val}" agregada a tus palabras clave ✓`);
+}
+function actualizarResumenKW(){
+  const kws = getKeywords();
+  const resEl = document.getElementById('kw-resumen');
+  if(resEl) resEl.textContent = kws.length ? kws.join(', ') : 'ninguna — agrega palabras en tu perfil';
+}
+
+// ── VISOR DE DOCUMENTOS ──
+const visorDocs = {}; // {licId: [{name, size, url, tipo, estado}]}
+
+function visorDrop(e, licId){
+  e.preventDefault();
+  visorAgregarArchivos(e.dataTransfer.files, licId);
+}
+
+function visorAgregarArchivos(files, licId){
+  if(!visorDocs[licId]) visorDocs[licId] = [];
+  Array.from(files).forEach(f => {
+    const url = URL.createObjectURL(f);
+    visorDocs[licId].push({
+      name: f.name,
+      size: f.size < 1048576 ? (f.size/1024).toFixed(0)+' KB' : (f.size/1048576).toFixed(1)+' MB',
+      url,
+      tipo: f.name.toLowerCase().endsWith('.pdf') ? 'pdf' : 'doc',
+      estado: 'pendiente',
+      abierto: false,
+      file: f
+    });
+  });
+  visorRenderLista(licId);
+  toast(`${files.length} archivo${files.length>1?'s':''} cargado${files.length>1?'s':''} ✓`);
+}
+
+function visorRenderLista(licId){
+  const lista = document.getElementById('visor-lista-'+licId);
+  if(!lista) return;
+  const docs = visorDocs[licId] || [];
+  if(!docs.length){ lista.innerHTML=''; return; }
+  lista.innerHTML = docs.map((d,i) => `
+    <div class="visor-item" id="vi-${licId}-${i}">
+      <div class="visor-item-header" onclick="visorToggle('${licId}',${i})">
+        <i class="ti ti-file-type-${d.tipo} visor-item-icon"></i>
+        <div class="visor-item-info">
+          <div class="visor-item-name">${d.name}</div>
+          <div class="visor-item-meta">${d.size} · <span class="visor-status ${d.estado==='done'?'vs-done':d.estado==='proc'?'vs-proc':'vs-pending'}">${d.estado==='done'?'✓ Rellenado':d.estado==='proc'?'Procesando...':'Pendiente'}</span></div>
+        </div>
+        <div class="visor-item-btns">
+          <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();visorRellenar('${licId}',${i})"><i class="ti ti-bolt"></i> Rellenar</button>
+          <button class="btn btn-outline btn-sm" onclick="event.stopPropagation();visorEliminar('${licId}',${i})"><i class="ti ti-trash"></i></button>
+          <i class="ti ti-chevron-${d.abierto?'up':'down'}" style="color:var(--ink3);font-size:16px;"></i>
+        </div>
+      </div>
+      <div class="visor-preview ${d.abierto?'open':''}" id="vp-${licId}-${i}">
+        ${d.tipo==='pdf'
+          ? `<iframe class="visor-pdf-frame" src="${d.url}"></iframe>`
+          : `<div style="padding:20px;text-align:center;color:var(--ink3)"><i class="ti ti-file-text" style="font-size:40px;display:block;margin-bottom:8px;"></i>Vista previa no disponible para .doc<br><a href="${d.url}" download="${d.name}" class="btn btn-outline btn-sm" style="margin-top:10px;display:inline-flex"><i class="ti ti-download"></i> Descargar</a></div>`
+        }
+      </div>
+    </div>`).join('');
+}
+
+function visorToggle(licId, idx){
+  if(!visorDocs[licId]) return;
+  visorDocs[licId][idx].abierto = !visorDocs[licId][idx].abierto;
+  visorRenderLista(licId);
+}
+
+function visorEliminar(licId, idx){
+  visorDocs[licId].splice(idx,1);
+  visorRenderLista(licId);
+}
+
+async function visorRellenar(licId, idx){
+  const doc = visorDocs[licId][idx];
+  visorDocs[licId][idx].estado = 'proc';
+  visorRenderLista(licId);
+  // Simular procesamiento
+  await new Promise(r => setTimeout(r, 1800));
+  visorDocs[licId][idx].estado = 'done';
+  visorRenderLista(licId);
+  toast(`"${doc.name}" rellenado con tus datos ✓`);
+}
+
+async function visorProcesarTodo(licId){
+  const docs = visorDocs[licId] || [];
+  if(!docs.length){ toast('Primero sube los documentos de la licitación'); return; }
+  for(let i=0; i<docs.length; i++){
+    await visorRellenar(licId, i);
+  }
+  toast('¡Todos los documentos rellenados! Ábrelos para revisar y descargar.');
+}
+
+// ── UTILS ──
+function abrirDetalleDesdeDash(codigo){
+  // Ir a pantalla de licitaciones y abrir el detalle de esa licitación
+  goScreen('licitaciones');
+  document.getElementById('licit-lista').style.display = 'block';
+  document.getElementById('licit-detalle').style.display = 'none';
+  // Buscar el índice en filtradas
+  filtradas = [...licitaciones];
+  renderLista(filtradas);
+  const idx = filtradas.findIndex(l => l.CodigoExterno === codigo);
+  if(idx >= 0){
+    setTimeout(() => verDetalle(idx), 100);
+  }
+}
+
+function verificarLink(e, url){
+  // La URL de MP a veces redirige — abrimos igual pero avisamos
+  return true;
+}
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+</script>
+</body>
+</html>
