@@ -53,15 +53,16 @@ body{font-family:var(--fd);color:var(--ink);background:var(--surface2);min-heigh
 .user-name{font-size:13px;color:rgba(255,255,255,.9);}
 
 .sidebar{
-  position:fixed;left:0;top:56px;bottom:0;width:220px;
+  position:fixed;left:0;top:56px;bottom:0;width:240px;
   background:var(--surface);border-right:1px solid var(--line);
   padding:16px 0;display:flex;flex-direction:column;z-index:50;
+  overflow-y:auto;overflow-x:hidden;
 }
 .nav-item{
   display:flex;align-items:center;gap:10px;
-  padding:9px 20px;font-size:13.5px;font-weight:500;
+  padding:9px 20px;font-size:13px;font-weight:500;
   color:var(--ink2);cursor:pointer;border-left:3px solid transparent;
-  transition:all .15s;
+  transition:all .15s;white-space:nowrap;overflow:hidden;
 }
 .nav-item:hover{background:var(--surface2);color:var(--ink);}
 .nav-item.active{color:var(--brand);background:var(--brand-light);border-left-color:var(--brand);}
@@ -73,7 +74,7 @@ body{font-family:var(--fd);color:var(--ink);background:var(--surface2);min-heigh
 .ticket-label{font-size:10px;color:var(--ink3);margin-bottom:2px;}
 .ticket-val{font-size:11px;color:var(--brand);font-family:monospace;word-break:break-all;}
 
-.main{margin-left:220px;padding:28px;min-height:calc(100vh - 56px);}
+.main{margin-left:240px;padding:28px;min-height:calc(100vh - 56px);overflow-x:hidden;}
 
 /* ── SCREENS ── */
 .screen{display:none;}
@@ -357,9 +358,9 @@ select.filter:focus{outline:none;border-color:var(--brand2);}
       <i class="ti ti-user-circle"></i> Mi perfil
     </div>
     <div class="nav-bottom">
-      <div class="ticket-badge">
-        <div class="ticket-label">Ticket API activo</div>
-        <div class="ticket-val">BB555465-BB26...</div>
+      <div class="ticket-badge" style="margin:0 12px;">
+        <div class="ticket-label">Ticket API</div>
+        <div class="ticket-val" style="font-size:10px">BB555465...</div>
       </div>
     </div>
   </div>
@@ -375,7 +376,7 @@ select.filter:focus{outline:none;border-color:var(--brand2);}
       </div>
 
       <!-- TABLERO DIVIDIDO: LICITACIONES | COMPRAS ÁGILES -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;min-width:0;">
 
         <!-- COLUMNA LICITACIONES -->
         <div>
@@ -386,8 +387,8 @@ select.filter:focus{outline:none;border-color:var(--brand2);}
           </div>
 
           <!-- Stats licitaciones -->
-          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;">
-            <div class="stat" onclick="filtrarPorPlazo('hoy')" style="cursor:pointer;border-left:3px solid var(--danger);padding:10px 12px;">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px;">
+            <div class="stat" onclick="filtrarPorPlazo('hoy')" style="cursor:pointer;border-left:3px solid var(--danger);padding:8px 10px;">
               <div class="stat-label" style="font-size:10px;"><i class="ti ti-alarm" style="color:var(--danger)"></i> Cierran HOY</div>
               <div class="stat-value" style="color:var(--danger);font-size:20px;" id="d-hoy">—</div>
               <div style="font-size:10px;color:var(--ink3);margin-top:2px;">↗ Ver</div>
