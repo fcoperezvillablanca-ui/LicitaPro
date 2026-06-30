@@ -748,7 +748,7 @@ select.filter:focus{outline:none;border-color:var(--brand2);}
 
 <script>
 const TICKET = 'BB555465-BB26-4427-A97D-3576980D3B85';
-const SUPABASE_FN_URL = '/.netlify/functions/mp-proxy'; // Función local de Netlify — sin CORS
+const SUPABASE_FN_URL = 'https://bmbdlcfogydwfzyersbf.supabase.co/functions/v1/super-worker';
 const SUPABASE_ANON_KEY = 'sb_publishable_uuZFXpD6aRJ4TueIZzA3OQ_TUatwzLx';
 let licitaciones = [], filtradas = [], archivos = [];
 let procesando = false;
@@ -809,13 +809,23 @@ async function cargarLicitaciones(forzar){
   setHtml('dash-rubros','<div class="loading"><div class="spinner"></div> Cargando...</div>');
 
   // Intentar con timeout y retry automático
-  // Función Netlify en mismo dominio — sin problemas de CORS
-  const fetchConTimeout = (url, ms=25000) => {
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), ms);
-    return fetch(url, { signal: ctrl.signal })
-      .finally(() => clearTimeout(timer));
-  };
+  const fetchConTimeout = (url, ms=25000) => new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.setRequestHeader('Accept', 'application/json');
+    xhr.timeout = ms;
+    xhr.onload = () => {
+      if(xhr.status >= 200 && xhr.status < 300){
+        // Simular objeto Response con .ok y .json()
+        resolve({ ok: true, json: () => Promise.resolve(JSON.parse(xhr.responseText)) });
+      } else {
+        reject(new Error(`HTTP ${xhr.status}`));
+      }
+    };
+    xhr.onerror = () => reject(new Error('Error de red'));
+    xhr.ontimeout = () => reject(new Error('Timeout'));
+    xhr.send();
+  });
   let data = null;
   let intentos = 0;
   const MAX_INTENTOS = 3;
@@ -1447,6 +1457,87 @@ async function visorProcesarTodo(licId){
     await visorRellenar(licId, i);
   }
   toast('¡Todos los documentos rellenados! Ábrelos para revisar y descargar.');
+}
+
+
+// ── COMPRAS ÁGILES ──
+const CACHE_AGILES_KEY = 'licita_pro_agiles_cache';
+let ordenesAgiles = [];
+let agilesFiltradas = [];
+
+async function cargarAgiles(forzar){
+  if(!forzar){
+    try{
+      const cached = JSON.parse(localStorage.getItem(CACHE_AGILES_KEY));
+      if(cached && cached.data && cached.data.length && (Date.now()-cached.timestamp) < 30*60*1000){
+        ordenesAgiles = cached.data;
+        actualizarStatsAgiles();
+        filtrarAgiles();
+        toast('\u2713 ' + ordenesAgiles.length + ' compras ágiles en caché');
+        return;
+      }
+    }catch(e){}
+  }
+  setHtml('agiles-container','<div class="loading"><div class="spinner"></div> Cargando Compras Ágiles...</div>');
+  try {
+    const url = SUPABASE_FN_URL + '?tipo=agiles&dias=7';
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 25000);
+    const resp = await fetch(url, { signal: ctrl.signal }).finally(() => clearTimeout(timer));
+    if(!resp.ok) throw new Error('HTTP ' + resp.status);
+    const data = await resp.json();
+    if(data && data.Listado && data.Listado.length > 0){
+      ordenesAgiles = data.Listado;
+      toast('\u2713 ' + ordenesAgiles.length + ' compras ágiles cargadas');
+      try{ localStorage.setItem(CACHE_AGILES_KEY, JSON.stringify({timestamp:Date.now(),data:ordenesAgiles})); }catch(e){}
+    } else { ordenesAgiles = []; }
+  } catch(e) {
+    console.warn('Agiles error:', e.message);
+    ordenesAgiles = [];
+    setHtml('agiles-container','<div class="empty"><i class="ti ti-shopping-cart-off"></i>No se pudieron cargar las Compras Ágiles.<br><br><button class="btn btn-primary btn-sm" onclick="cargarAgiles(true)">Reintentar</button></div>');
+    return;
+  }
+  actualizarStatsAgiles();
+  filtrarAgiles();
+}
+
+function actualizarStatsAgiles(){
+  const ahora = new Date(); ahora.setHours(0,0,0,0);
+  const sinT = s => (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  const kws = getKeywords();
+  const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
+  set('ag-total', ordenesAgiles.length);
+  set('ag-semana', ordenesAgiles.filter(o=>{ const f=parseFecha(o.FechaEnvioOrden||o.Fecha); return f&&(ahora-f)>=0&&(ahora-f)<=7*86400000; }).length);
+  set('ag-rubros', ordenesAgiles.filter(o=>!kws.length||kws.some(kw=>sinT(o.Nombre||o.NombreItem||'').includes(sinT(kw)))).length);
+  const kwEl=document.getElementById('ag-kw-resumen'); if(kwEl) kwEl.textContent=kws.length?kws.join(', '):'ninguna';
+}
+
+function filtrarAgiles(){
+  const q = ((document.getElementById('ag-q')||{}).value||'').toLowerCase();
+  const est = (document.getElementById('ag-estado')||{}).value||'';
+  const usarKW = document.getElementById('ag-toggle-kw')?.checked;
+  const kws = usarKW ? getKeywords() : [];
+  const sinT = s => (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  agilesFiltradas = ordenesAgiles.filter(o => {
+    const nom = (o.Nombre||o.NombreItem||'').toLowerCase();
+    const cod = (o.CodigoExterno||o.Numero||'').toLowerCase();
+    return (!q||nom.includes(q)||cod.includes(q)) &&
+           (!est||(o.Estado||'')=== est) &&
+           (!kws.length||kws.some(kw=>sinT(nom).includes(sinT(kw))));
+  });
+  renderAgiles(agilesFiltradas);
+}
+
+function renderAgiles(lista){
+  const c = document.getElementById('agiles-container'); if(!c) return;
+  if(!lista.length){ c.innerHTML='<div class="empty"><i class="ti ti-shopping-cart-off"></i>Sin resultados para tu búsqueda.</div>'; return; }
+  c.innerHTML = '<div style="margin-bottom:10px;font-size:13px;color:var(--ink3)">' + lista.length + ' resultados</div><div class="licit-list">' +
+    lista.slice(0,50).map(o => {
+      const monto = (o.TotalNeto||o.Monto) ? '$'+Math.round(o.TotalNeto||o.Monto).toLocaleString('es-CL') : '\u2014';
+      const cod = o.CodigoExterno||o.Numero||'\u2014';
+      const mpUrl = 'https://www.mercadopublico.cl/Procurement/Modules/RFB/StepsProcessAGQ/SentToProvider.aspx?idLicitacion='+encodeURIComponent(cod);
+      return '<div class="licit-card"><div class="lc-top"><div><div class="lc-code"><i class="ti ti-shopping-cart"></i> '+cod+'</div><div class="lc-name">'+(o.Nombre||o.NombreItem||'Sin nombre')+'</div><div class="lc-org"><i class="ti ti-building"></i>'+(o.NombreOrganismo||o.Comprador||'\u2014')+'</div></div><div style="text-align:right;flex-shrink:0"><div style="font-size:15px;font-weight:700;color:var(--accent)">'+monto+'</div></div></div><div class="lc-footer"><span class="badge b-green">Compra Ágil</span><div style="margin-left:auto"><a href="'+mpUrl+'" target="_blank" class="btn btn-outline btn-sm"><i class="ti ti-external-link"></i> Ver en MP</a></div></div></div>';
+    }).join('') + '</div>';
 }
 
 // ── UTILS ──
