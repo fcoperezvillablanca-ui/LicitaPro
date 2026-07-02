@@ -1,0 +1,8 @@
+{
+  "name": "licita-pro",
+  "version": "1.0.0",
+  "description": "Licita Pro — Gestión de licitaciones públicas",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
