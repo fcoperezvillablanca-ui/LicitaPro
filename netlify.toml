@@ -1,5 +1,2 @@
 [build]
   functions = "."
-
-[functions]
-  excluded_patterns = ["index.html", "netlify.toml", "package.json", "README.md"]
