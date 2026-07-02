@@ -1,5 +1,5 @@
 [build]
-  functions = "netlify/functions"
+  functions = "."
 
-[[plugins]]
-  package = "@netlify/plugin-functions-install-core"
+[functions]
+  excluded_patterns = ["index.html", "netlify.toml", "package.json", "README.md"]
