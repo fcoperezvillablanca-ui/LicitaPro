@@ -713,7 +713,7 @@ select.filter:focus{outline:none;border-color:var(--brand2);}
 
 <script>
 const TICKET = 'BB555465-BB26-4427-A97D-3576980D3B85';
-const SUPABASE_FN_URL = '/.netlify/functions/mp-proxy';
+const SUPABASE_FN_URL = 'https://bmbdlcfogydwfzyersbf.supabase.co/functions/v1/super-worker';
 const SUPABASE_ANON_KEY = 'sb_publishable_uuZFXpD6aRJ4TueIZzA3OQ_TUatwzLx';
 let licitaciones = [], filtradas = [], archivos = [];
 let procesando = false;
@@ -773,18 +773,19 @@ async function cargarLicitaciones(forzar){
   setHtml('dash-urgentes','<div class="loading"><div class="spinner"></div> Cargando...</div>');
   setHtml('dash-rubros','<div class="loading"><div class="spinner"></div> Cargando...</div>');
 
-  // Intentar con timeout y retry automático
+  // Fetch con XHR — evita bloqueos de Edge/navegadores
   const fetchConTimeout = (url, ms=25000) => new Promise((resolve, reject) => {
     const xhr = new XMLHttpRequest();
     xhr.open('GET', url, true);
     xhr.setRequestHeader('Accept', 'application/json');
+    xhr.setRequestHeader('apikey', 'sb_publishable_uuZFXpD6aRJ4TueIZzA3OQ_TUatwzLx');
+    xhr.setRequestHeader('Authorization', 'Bearer sb_publishable_uuZFXpD6aRJ4TueIZzA3OQ_TUatwzLx');
     xhr.timeout = ms;
     xhr.onload = () => {
       if(xhr.status >= 200 && xhr.status < 300){
-        // Simular objeto Response con .ok y .json()
         resolve({ ok: true, json: () => Promise.resolve(JSON.parse(xhr.responseText)) });
       } else {
-        reject(new Error(`HTTP ${xhr.status}`));
+        reject(new Error('HTTP ' + xhr.status));
       }
     };
     xhr.onerror = () => reject(new Error('Error de red'));
