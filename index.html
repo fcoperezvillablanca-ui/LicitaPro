@@ -1496,12 +1496,73 @@ function renderAgiles(lista){
   const c = document.getElementById('agiles-container'); if(!c) return;
   if(!lista.length){ c.innerHTML='<div class="empty"><i class="ti ti-shopping-cart-off"></i>Sin resultados para tu búsqueda.</div>'; return; }
   c.innerHTML = '<div style="margin-bottom:10px;font-size:13px;color:var(--ink3)">' + lista.length + ' resultados</div><div class="licit-list">' +
-    lista.slice(0,50).map(o => {
-      const monto = (o.TotalNeto||o.Monto) ? '$'+Math.round(o.TotalNeto||o.Monto).toLocaleString('es-CL') : '\u2014';
-      const cod = o.CodigoExterno||o.Numero||'\u2014';
+    lista.slice(0,50).map((o,i) => {
+      const monto = (o.TotalNeto||o.Monto) ? '$'+Math.round(o.TotalNeto||o.Monto).toLocaleString('es-CL') : '—';
+      const cod = o.CodigoExterno||o.Numero||'—';
+      const nombre = o.Nombre||o.NombreItem||'Sin nombre';
+      const organismo = o.NombreOrganismo||o.Comprador||'—';
+      const estado = o.Estado||'Enviada';
+      const fecha = o.FechaEnvioOrden||o.Fecha||'';
+      const fechaStr = fecha ? new Date(fecha).toLocaleDateString('es-CL') : '—';
       const mpUrl = 'https://www.mercadopublico.cl/Procurement/Modules/RFB/StepsProcessAGQ/SentToProvider.aspx?idLicitacion='+encodeURIComponent(cod);
-      return '<div class="licit-card"><div class="lc-top"><div><div class="lc-code"><i class="ti ti-shopping-cart"></i> '+cod+'</div><div class="lc-name">'+(o.Nombre||o.NombreItem||'Sin nombre')+'</div><div class="lc-org"><i class="ti ti-building"></i>'+(o.NombreOrganismo||o.Comprador||'\u2014')+'</div></div><div style="text-align:right;flex-shrink:0"><div style="font-size:15px;font-weight:700;color:var(--accent)">'+monto+'</div></div></div><div class="lc-footer"><span class="badge b-green">Compra Ágil</span><div style="margin-left:auto"><a href="'+mpUrl+'" target="_blank" class="btn btn-outline btn-sm"><i class="ti ti-external-link"></i> Ver en MP</a></div></div></div>';
+      const badgeColor = estado==='Aceptada'?'b-green':estado==='Recepcion Conforme'?'b-blue':'b-amber';
+      return '<div class="licit-card" onclick="verDetalleAgil('+i+',agilesFiltradas)">' +
+        '<div class="lc-top">' +
+          '<div style="flex:1;min-width:0">' +
+            '<div class="lc-code"><i class="ti ti-shopping-cart"></i> '+cod+'</div>' +
+            '<div class="lc-name">'+nombre+'</div>' +
+            '<div class="lc-org"><i class="ti ti-building"></i>'+organismo+'</div>' +
+          '</div>' +
+          '<div style="text-align:right;flex-shrink:0;margin-left:12px">' +
+            '<div style="font-size:16px;font-weight:700;color:var(--accent)">'+monto+'</div>' +
+            '<div style="font-size:11px;color:var(--ink3);margin-top:2px">'+fechaStr+'</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="lc-footer">' +
+          '<span class="badge '+badgeColor+'">'+estado+'</span>' +
+          '<div style="margin-left:auto;display:flex;gap:6px;">' +
+            '<a href="'+mpUrl+'" target="_blank" class="btn btn-outline btn-sm" onclick="event.stopPropagation()"><i class="ti ti-external-link"></i> Ver en MP</a>' +
+            '<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();goScreen(&quot;procesar&quot;)"><i class="ti ti-bolt"></i> Procesar</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
     }).join('') + '</div>';
+}
+
+function verDetalleAgil(idx, lista){
+  const o = lista[idx];
+  if(!o) return;
+  const cod = o.CodigoExterno||o.Numero||'—';
+  const monto = (o.TotalNeto||o.Monto) ? '$'+Math.round(o.TotalNeto||o.Monto).toLocaleString('es-CL') : '—';
+  const mpUrl = 'https://www.mercadopublico.cl/Procurement/Modules/RFB/StepsProcessAGQ/SentToProvider.aspx?idLicitacion='+encodeURIComponent(cod);
+  const fecha = o.FechaEnvioOrden||o.Fecha||'';
+  const fechaStr = fecha ? new Date(fecha).toLocaleDateString('es-CL') : '—';
+
+  // Mostrar modal/panel de detalle
+  const c = document.getElementById('agiles-container');
+  c.innerHTML = `
+    <button class="back-btn" onclick="filtrarAgiles()">
+      <i class="ti ti-arrow-left"></i> Volver
+    </button>
+    <div class="det-hero">
+      <div class="det-code"><i class="ti ti-shopping-cart"></i> ${cod}</div>
+      <div class="det-title">${o.Nombre||o.NombreItem||'Sin nombre'}</div>
+      <div class="det-org">${o.NombreOrganismo||o.Comprador||'—'}</div>
+      <div class="det-badges">
+        <span class="badge b-green">${o.Estado||'Compra Ágil'}</span>
+        <a href="${mpUrl}" target="_blank" class="mp-link"><i class="ti ti-external-link"></i> Ver en Mercado Público</a>
+      </div>
+    </div>
+    <div class="det-grid">
+      <div class="det-item"><label>Fecha emisión</label><span>${fechaStr}</span></div>
+      <div class="det-item"><label>Monto</label><span>${monto}</span></div>
+      <div class="det-item"><label>Estado</label><span>${o.Estado||'—'}</span></div>
+      <div class="det-item"><label>Código</label><span>${cod}</span></div>
+    </div>
+    <div class="actions-row">
+      <a href="${mpUrl}" target="_blank" class="btn btn-success"><i class="ti ti-external-link"></i> Ver en Mercado Público</a>
+      <button class="btn btn-primary" onclick="goScreen('procesar')"><i class="ti ti-bolt"></i> Procesar documentos</button>
+    </div>`;
 }
 
 // ── UTILS ──
