@@ -1,4 +1,4 @@
-<!DOCTYPE html><!-- v2 -->
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8"/>
@@ -374,10 +374,10 @@ select.filter:focus{outline:none;border-color:var(--brand2);}
       </div>
 
       <!-- TABLERO DIVIDIDO: LICITACIONES | COMPRAS ÁGILES -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;min-width:0;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;min-width:0;overflow:hidden;">
 
         <!-- COLUMNA LICITACIONES -->
-        <div>
+        <div style="min-width:0;overflow:hidden;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid var(--brand);">
             <i class="ti ti-list-search" style="color:var(--brand);font-size:20px;"></i>
             <span style="font-family:var(--fs);font-size:15px;font-weight:700;color:var(--brand)">Licitaciones</span>
@@ -425,7 +425,7 @@ select.filter:focus{outline:none;border-color:var(--brand2);}
         </div>
 
         <!-- COLUMNA COMPRAS ÁGILES -->
-        <div>
+        <div style="min-width:0;overflow:hidden;">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;padding-bottom:10px;border-bottom:2px solid var(--accent);">
             <i class="ti ti-shopping-cart" style="color:var(--accent);font-size:20px;"></i>
             <span style="font-family:var(--fs);font-size:15px;font-weight:700;color:var(--accent)">Compras Ágiles</span>
@@ -456,7 +456,7 @@ select.filter:focus{outline:none;border-color:var(--brand2);}
             <div style="background:var(--accent-light);padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px;font-weight:600;color:var(--accent);">
               <i class="ti ti-shopping-cart"></i> Recientes en tus rubros
             </div>
-            <div id="dash-agiles" style="padding:12px;">
+            <div id="dash-agiles-rubros" style="padding:12px;">
               <div class="loading"><div class="spinner"></div> Cargando...</div>
             </div>
           </div>
