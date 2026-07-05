@@ -1504,7 +1504,7 @@ function renderAgiles(lista){
       const estado = o.Estado||'Enviada';
       const fecha = o.FechaEnvioOrden||o.Fecha||'';
       const fechaStr = fecha ? new Date(fecha).toLocaleDateString('es-CL') : '—';
-      const mpUrl = 'https://www.mercadopublico.cl/Procurement/Modules/RFB/StepsProcessAGQ/SentToProvider.aspx?idLicitacion='+encodeURIComponent(cod);
+      const mpUrl = 'https://buscador.mercadopublico.cl/ordenes-de-compra?q='+encodeURIComponent(cod);
       const badgeColor = estado==='Aceptada'?'b-green':estado==='Recepcion Conforme'?'b-blue':'b-amber';
       return '<div class="licit-card" onclick="verDetalleAgil('+i+',agilesFiltradas)">' +
         '<div class="lc-top">' +
@@ -1534,7 +1534,7 @@ function verDetalleAgil(idx, lista){
   if(!o) return;
   const cod = o.CodigoExterno||o.Numero||'—';
   const monto = (o.TotalNeto||o.Monto) ? '$'+Math.round(o.TotalNeto||o.Monto).toLocaleString('es-CL') : '—';
-  const mpUrl = 'https://www.mercadopublico.cl/Procurement/Modules/RFB/StepsProcessAGQ/SentToProvider.aspx?idLicitacion='+encodeURIComponent(cod);
+  const mpUrl = 'https://buscador.mercadopublico.cl/ordenes-de-compra?q='+encodeURIComponent(cod);
   const fecha = o.FechaEnvioOrden||o.Fecha||'';
   const fechaStr = fecha ? new Date(fecha).toLocaleDateString('es-CL') : '—';
 
