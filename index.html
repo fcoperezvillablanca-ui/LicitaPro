@@ -1001,7 +1001,7 @@ function actualizarDashAgiles(){
   const sinT = s => (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
   const enRubros = ordenesAgiles.filter(o => {
     if(!keywords.length) return true;
-    const nom = sinT(o.Nombre||o.NombreItem||'');
+    const nom = sinT(o.Nombre||'');
     return keywords.some(kw => nom.includes(sinT(kw)));
   });
 
@@ -1014,7 +1014,7 @@ function actualizarDashAgiles(){
   box.innerHTML = enRubros.slice(0,4).map(o => {
     const monto = o.TotalNeto||o.Monto ? '$'+Math.round(o.TotalNeto||o.Monto).toLocaleString('es-CL') : '—';
     return `<div style="padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer" onclick="goScreen('agiles')">
-      <div style="font-size:11px;color:var(--ink3);margin-bottom:2px">${o.CodigoExterno||o.Numero||'—'} · ${o.NombreOrganismo||o.Comprador||'—'}</div>
+      <div style="font-size:11px;color:var(--ink3);margin-bottom:2px">${o.Codigo||o.CodigoExterno||'—'} · ${o.NombreUnidad||o.NombreOrganismo||o.Comprador||'—'}</div>
       <div style="font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${o.Nombre||o.NombreItem||'Sin nombre'}</div>
       <div style="display:flex;gap:8px;margin-top:3px;align-items:center">
         <span class="badge b-green" style="font-size:10px">Compra Ágil</span>
@@ -1472,7 +1472,7 @@ function actualizarStatsAgiles(){
   const set = (id,v) => { const e=document.getElementById(id); if(e) e.textContent=v; };
   set('ag-total', ordenesAgiles.length);
   set('ag-semana', ordenesAgiles.filter(o=>{ const f=parseFecha(o.FechaEnvioOrden||o.Fecha); return f&&(ahora-f)>=0&&(ahora-f)<=7*86400000; }).length);
-  set('ag-rubros', ordenesAgiles.filter(o=>!kws.length||kws.some(kw=>sinT(o.Nombre||o.NombreItem||'').includes(sinT(kw)))).length);
+  set('ag-rubros', ordenesAgiles.filter(o=>!kws.length||kws.some(kw=>sinT(o.Nombre||'').includes(sinT(kw)))).length);
   const kwEl=document.getElementById('ag-kw-resumen'); if(kwEl) kwEl.textContent=kws.length?kws.join(', '):'ninguna';
 }
 
@@ -1484,7 +1484,7 @@ function filtrarAgiles(){
   const sinT = s => (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
   agilesFiltradas = ordenesAgiles.filter(o => {
     const nom = (o.Nombre||o.NombreItem||'').toLowerCase();
-    const cod = (o.CodigoExterno||o.Numero||'').toLowerCase();
+    const cod = (o.Codigo||o.CodigoExterno||o.Numero||'').toLowerCase();
     return (!q||nom.includes(q)||cod.includes(q)) &&
            (!est||(o.Estado||'')=== est) &&
            (!kws.length||kws.some(kw=>sinT(nom).includes(sinT(kw))));
@@ -1498,13 +1498,13 @@ function renderAgiles(lista){
   c.innerHTML = '<div style="margin-bottom:10px;font-size:13px;color:var(--ink3)">' + lista.length + ' resultados</div><div class="licit-list">' +
     lista.slice(0,50).map((o,i) => {
       const monto = (o.TotalNeto||o.Monto) ? '$'+Math.round(o.TotalNeto||o.Monto).toLocaleString('es-CL') : '—';
-      const cod = o.CodigoExterno||o.Numero||'—';
+      const cod = o.Codigo||o.CodigoExterno||o.Numero||'—';
       const nombre = o.Nombre||o.NombreItem||'Sin nombre';
       const organismo = o.NombreOrganismo||o.Comprador||'—';
       const estado = o.Estado||'Enviada';
       const fecha = o.FechaEnvioOrden||o.Fecha||'';
       const fechaStr = fecha ? new Date(fecha).toLocaleDateString('es-CL') : '—';
-      const mpUrl = 'https://buscador.mercadopublico.cl/ordenes-de-compra?q='+encodeURIComponent(cod);
+      const mpUrl = 'https://www.mercadopublico.cl/Procurement/Modules/PO/DetailsPurchaseOrder.aspx?codigoOC='+encodeURIComponent(cod);
       const badgeColor = estado==='Aceptada'?'b-green':estado==='Recepcion Conforme'?'b-blue':'b-amber';
       return '<div class="licit-card" onclick="verDetalleAgil('+i+',agilesFiltradas)">' +
         '<div class="lc-top">' +
@@ -1532,9 +1532,9 @@ function renderAgiles(lista){
 function verDetalleAgil(idx, lista){
   const o = lista[idx];
   if(!o) return;
-  const cod = o.CodigoExterno||o.Numero||'—';
+  const cod = o.Codigo||o.CodigoExterno||o.Numero||'—';
   const monto = (o.TotalNeto||o.Monto) ? '$'+Math.round(o.TotalNeto||o.Monto).toLocaleString('es-CL') : '—';
-  const mpUrl = 'https://buscador.mercadopublico.cl/ordenes-de-compra?q='+encodeURIComponent(cod);
+  const mpUrl = 'https://www.mercadopublico.cl/Procurement/Modules/PO/DetailsPurchaseOrder.aspx?codigoOC='+encodeURIComponent(cod);
   const fecha = o.FechaEnvioOrden||o.Fecha||'';
   const fechaStr = fecha ? new Date(fecha).toLocaleDateString('es-CL') : '—';
 
